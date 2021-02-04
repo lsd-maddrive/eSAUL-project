@@ -24,14 +24,14 @@ class ModelPush : public ModelPlugin
 		this->model = _parent;
 		this->sdf = _sdf;
 
-		wheel_joint_right_1 = model->GetJoint("joint_right_wheel_1");
+		/*
 		wheel_joint_left_1 = model->GetJoint("joint_left_wheel_1");
 		wheel_joint_right_2 = model->GetJoint("joint_right_wheel_2");
 		wheel_joint_left_2 = model->GetJoint("joint_left_wheel_2");
 		wheel_joint_right_3 = model->GetJoint("joint_right_wheel_3");
 		wheel_joint_left_3 = model->GetJoint("joint_left_wheel_3");
 		wheel_joint_right_4 = model->GetJoint("joint_right_wheel_4");
-		wheel_joint_left_4 = model->GetJoint("joint_left_wheel_4");
+		wheel_joint_left_4 = model->GetJoint("joint_left_wheel_4");*/
 
 		if (sdf->HasElement("robotName"))
 		{
@@ -43,14 +43,15 @@ class ModelPush : public ModelPlugin
 		{
 			cout << "********************Name don't received********************" << endl;
 		}
-		updateConnection = event::Events::ConnectWorldUpdateBegin(std::bind(&ModelPush::OnUpdate, this));
+		/*updateConnection = event::Events::ConnectWorldUpdateBegin(std::bind(&ModelPush::OnUpdate, this));
 		nh = ros::NodeHandle(roboname);
-    		cmd_vel_sub_ = nh.subscribe("cmd_vel", 1, &ModelPush::CmdVel, this);
+    		cmd_vel_sub_ = nh.subscribe("cmd_vel", 1, &ModelPush::CmdVel, this);*/
 	}
+	/*
 	void OnUpdate()
     	{
-      		wheel_joint_right_1->SetVelocity(0, lin_speed);
-		wheel_joint_left_1->SetVelocity(0, lin_speed);
+      		//wheel_joint_right_1->SetVelocity(0, lin_speed);
+		//wheel_joint_left_1->SetVelocity(0, lin_speed);
     	}
 	void CmdVel(const geometry_msgs::Twist& command)
     	{
@@ -60,23 +61,17 @@ class ModelPush : public ModelPlugin
 	~ModelPush()
 	{
 		nh.shutdown();
-	}
+	}*/
 	private: 
-	double lin_speed=0;
+	//double _left=0;
+	//double _right=0;
+	//double lin_speed;
 	physics::ModelPtr model;
-	physics::JointPtr wheel_joint_left_1;
-	physics::JointPtr wheel_joint_right_1;
-	physics::JointPtr wheel_joint_left_2;
-	physics::JointPtr wheel_joint_right_2;
-	physics::JointPtr wheel_joint_left_3;
-	physics::JointPtr wheel_joint_right_3;
-	physics::JointPtr wheel_joint_left_4;
-	physics::JointPtr wheel_joint_right_4;
 	sdf::ElementPtr sdf;
 	std::string roboname;	
-    	ros::NodeHandle nh;
-	event::ConnectionPtr updateConnection;
-	ros::Subscriber cmd_vel_sub_;
+    	//ros::NodeHandle nh;
+	//event::ConnectionPtr updateConnection;
+	//ros::Subscriber cmd_vel_sub_;
 };
   
   GZ_REGISTER_MODEL_PLUGIN(ModelPush)

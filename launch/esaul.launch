@@ -4,9 +4,9 @@
         <arg name="debug" default="false" />
         <arg name="gui" default="true" />
         <arg name="pause" default="false" />
-        <arg name="world" default="$(find eSAUl_ad_helll)/worlds/hello.world" />
+        <arg name="world" default="$(find esaul_ad_helll)/worlds/hello.world" />
 	
-	<param name="robot_description" command="$(find xacro)/xacro '$(find eSAUl_ad_helll)/urdf/eSAUl.xacro'" />
+	<param name="robot_description" command="$(find xacro)/xacro '$(find esaul_ad_helll)/urdf/esaul.xacro'" />
 
     	<arg name="x" default="0"/>
 	<arg name="y" default="0"/>

@@ -10,6 +10,6 @@
     </include>
 
     <!-- reference to your plugin -->
-    <plugin name="eSAUl_ad_hell" filename="lib_eSAUl.so"/>
+    <plugin name="esaul_ad_hell" filename="libesaul_ad_helll.so"/>
   </world>
 </sdf>

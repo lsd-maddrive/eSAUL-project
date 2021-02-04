@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <package>
-  <name>eSAUl_ad_helll</name>
+  <name>esaul_ad_helll</name>
   <version>0.0.0</version>
   <description>The robot_gazebo package</description>
   <maintainer email="user@todo.todo">user</maintainer>

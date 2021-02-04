@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(eSAUl_ad_helll)
+project(esaul_ad_helll)
 
 # Check for c++11 / c++0x support
 include(CheckCXXCompilerFlag)
@@ -31,5 +31,5 @@ catkin_package(
     gazebo_ros
 )
 
-add_library(${PROJECT_NAME} src/eSAUl_plugin.cpp)
+add_library(${PROJECT_NAME} src/esaul_plugin.cpp)
 target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES} ${GAZEBO_LIBRARIES})

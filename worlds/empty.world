@@ -11,6 +11,6 @@
 		<include>
 			<uri>model://ground_plane</uri>
 		</include>
-		<plugin name="eSAUl_ad_helll" filename="lib_eSAUl.so"/>
+		<plugin name="esaul_ad_helll" filename="libesaul_ad_helll.so"/>
 	</world>
 </sdf>
