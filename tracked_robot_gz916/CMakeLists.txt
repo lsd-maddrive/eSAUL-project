@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(esaul_description)
+project(tracked_robot_gz916)
 
 # Check for c++11 / c++0x support
 include(CheckCXXCompilerFlag)
@@ -23,7 +23,13 @@ find_package(catkin REQUIRED COMPONENTS
 find_package(gazebo REQUIRED)
 
 link_directories(${GAZEBO_LIBRARY_DIRS})
-include_directories(${Boost_INCLUDE_DIR} ${catkin_INCLUDE_DIRS} ${GAZEBO_INCLUDE_DIRS})
+include_directories(
+    plugins
+    deps/opende_internal
+    ${Boost_INCLUDE_DIR}
+    ${catkin_INCLUDE_DIRS}
+    ${GAZEBO_INCLUDE_DIRS}
+)
 
 catkin_package(
     DEPENDS
@@ -31,5 +37,16 @@ catkin_package(
     gazebo_ros
 )
 
-add_library(${PROJECT_NAME} src/esaul_plugin.cpp)
-target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES} ${GAZEBO_LIBRARIES})
+### Build plugin with it`s own name
+set(CONTROL_PLUGIN ESAUL_plugin)
+
+add_library(
+    ${CONTROL_PLUGIN}
+    plugins/TrackedVehiclePlugin.cc
+    plugins/SimpleTrackedVehiclePlugin.cc 
+)
+target_link_libraries(
+    ${CONTROL_PLUGIN} 
+    ${catkin_LIBRARIES} 
+    ${GAZEBO_LIBRARIES}
+)

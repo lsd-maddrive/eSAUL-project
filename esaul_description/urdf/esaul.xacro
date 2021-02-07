@@ -53,7 +53,7 @@
   <!-- INERTIAL MACROS END -->
 
   <link name="link_chassis">
-    <collision>
+    <collision name="collision_chassis">
       <geometry>
         <box size="${chassis_length} ${chassis_width} ${chassis_height}"/>
       </geometry>
@@ -71,51 +71,50 @@
       <origin xyz="0 0 0" rpy="0 0 0" />
     </xacro:solid_cuboid_inertial>
   </link>
-
   <xacro:macro name="link_track" params="name">
-    <link name="${name}">
-      <collision name="${name}_track_col_box">
-        <origin rpy="0 0 0" xyz="0 0 0"/>
-        <geometry>
-          <box size="${box_length} ${box_width} ${box_height}"/>
-        </geometry>
-      </collision>
-      <visual name="${name}_track_vis_box">
-        <origin rpy="0 0 0" xyz="0 0 0"/>
-        <geometry>
-          <box size="${box_length} ${box_width} ${box_height}"/>
-        </geometry>
-      </visual>
-      <collision name="${name}_track_col_back_wheel">
-        <origin rpy="0 1.5708 1.5708" xyz="${-box_length/2} 0 0"/>
-        <geometry>
-          <cylinder length="${track_length}" radius="${track_rad}"/>
-        </geometry>
-      </collision>
-      <visual name="${name}_track_vis_back_wheel">
-        <origin rpy="0 1.5708 1.5708" xyz="${-box_length/2} 0 0"/>
-        <geometry>
-          <cylinder length="${track_length}" radius="${track_rad}"/>
-        </geometry>
-      </visual>
-      <collision name="${name}_track_col_front_wheel">
-        <origin rpy="0 1.5708 1.5708" xyz="${box_length/2} 0 0"/>
-        <geometry>
-          <cylinder length="${track_length}" radius="${track_rad}"/>
-        </geometry>
-      </collision>
-      <visual name="${name}_track_vis_front_wheel">
-        <origin rpy="0 1.5708 1.5708" xyz="${box_length/2} 0 0"/>
-        <geometry>
-          <cylinder length="${track_length}" radius="${track_rad}"/>
-        </geometry>
-      </visual>
-      <xacro:solid_cuboid_inertial
-            length="${chassis_length}" width="${chassis_width}"
-            height="${chassis_height}" mass="${chassis_mass}">
-        <origin xyz="0 0 0" rpy="0 0 0" />
-      </xacro:solid_cuboid_inertial>
-    </link>
+   <link name="${name}">
+    <collision name="link_wheel_box">
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+         <box size="${box_length} ${box_width} ${box_height}"/>
+      </geometry>
+    </collision>
+    <visual name="link_wheel_box">
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+         <box size="${box_length} ${box_width} ${box_height}"/>
+      </geometry>
+    </visual>
+    <collision name="left_track_down">
+      <origin rpy="0 1.5708 1.5708" xyz="${-box_length/2} 0 0"/>
+      <geometry>
+         <cylinder length="${track_length}" radius="${track_rad}"/>
+      </geometry>
+    </collision>
+    <visual name="left_track_down">
+      <origin rpy="0 1.5708 1.5708" xyz="${-box_length/2} 0 0"/>
+      <geometry>
+         <cylinder length="${track_length}" radius="${track_rad}"/>
+      </geometry>
+    </visual>
+    <collision name="left_track_up">
+      <origin rpy="0 1.5708 1.5708" xyz="${box_length/2} 0 0"/>
+      <geometry>
+         <cylinder length="${track_length}" radius="${track_rad}"/>
+      </geometry>
+    </collision>
+    <visual name="left_track_up">
+      <origin rpy="0 1.5708 1.5708" xyz="${box_length/2} 0 0"/>
+      <geometry>
+         <cylinder length="${track_length}" radius="${track_rad}"/>
+      </geometry>
+    </visual>
+    <xacro:solid_cuboid_inertial
+          length="${chassis_length}" width="${chassis_width}"
+          height="${chassis_height}" mass="${chassis_mass}">
+      <origin xyz="0 0 0" rpy="0 0 0" />
+    </xacro:solid_cuboid_inertial>
+   </link>
     <gazebo reference="${name}">
       <mu1>${wheel_friction}</mu1>
       <mu2>${wheel_friction}</mu2>
@@ -125,39 +124,26 @@
     </gazebo>
   </xacro:macro>
 
-  <xacro:macro name="joint_wheel" params="name child origin_xyz">
-    <joint name="${name}" type="fixed">
-      <origin rpy="0 0 0" xyz="${origin_xyz}"/>
-      <child link="${child}"/>
-      <parent link="link_chassis"/>
-      <!-- <axis rpy="0 0 0" xyz="0 1 0"/> -->
-      <!-- <joint_properties damping="1.0" friction="1.0"/> -->
-    </joint>
-    <gazebo reference="${name}">
-      <!-- This one is used to disable convertion of fixed joints into links -->
-      <preserveFixedJoint>true</preserveFixedJoint>
-    </gazebo>
-  </xacro:macro>
+    <xacro:macro name="joint_wheel" params="name child origin_xyz">
+      <joint name="${name}" type="fixed">
+        <origin rpy="0 0 0" xyz="${origin_xyz}"/>
+        <child link="${child}"/>
+        <parent link="link_chassis"/>
+        <axis rpy="0 0 0" xyz="0 1 0"/>
+        <joint_properties damping="1.0" friction="1.0"/>
+      </joint>
+    </xacro:macro>
 
-	<xacro:link_track name="track_left" />
-	<xacro:joint_wheel name="joint_left" child="track_left" origin_xyz="0 ${-chassis_width/2-box_width/2} ${-track_rad}" />
+	<xacro:link_track name="link_left" />
+	<xacro:joint_wheel name="joint_left" child="link_left" origin_xyz="0 ${-chassis_width/2-box_width/2} ${-track_rad}" />
   
-	<xacro:link_track name="track_right" />
-	<xacro:joint_wheel name="joint_right" child="track_right" origin_xyz="0 ${chassis_width/2+box_width/2} ${-track_rad}" />
-
+	<xacro:link_track name="link_right" />
+	<xacro:joint_wheel name="joint_right" child="link_right" origin_xyz="0 ${chassis_width/2+box_width/2} ${-track_rad}" />
+    	
 	<gazebo>
-    <plugin filename="libESAUL_plugin.so" name="simple_tracked_vehicle">
-    <!-- <plugin filename="libSimpleTrackedVehiclePlugin.so" name="simple_tracked_vehicle"> -->
-        <body>link_chassis</body>
-        <left_track>track_left</left_track>
-        <right_track>track_right</right_track>
-        <track_mu>2</track_mu>
-        <track_mu2>0.5</track_mu2>
-    </plugin>
-    <!-- <plugin filename="libKeysToCmdVelPlugin.so" name="keyboard_control"> -->
-        <!-- <publish_as_twist>true</publish_as_twist> -->
-        <!-- <cmd_vel_topic>~/simple_tracked/cmd_vel_twist</cmd_vel_topic> -->
-    <!-- </plugin> -->
+    		<plugin name="ModelPlugin" filename="libesaul_description.so" >
+      			<robotName>eSAUl</robotName>
+   		 </plugin>
 	</gazebo>
 
  </robot>
