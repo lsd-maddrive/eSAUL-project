@@ -38,16 +38,15 @@ catkin_package(
 )
 
 ### Build plugin with it`s own name
-set(CONTROL_PLUGIN ESAUL_plugin)
+# set(CONTROL_PLUGIN ESAUL_plugin)
 
-add_library(
-    ${CONTROL_PLUGIN}
-    plugins/TrackedVehiclePlugin.cc
-    plugins/SimpleTrackedVehiclePlugin.cc 
-)
-target_link_libraries(
-    ${CONTROL_PLUGIN} 
-    ${catkin_LIBRARIES} 
-    ${GAZEBO_LIBRARIES}
-    # TrackedVehiclePlugin
-)
+# add_library(
+#     ${CONTROL_PLUGIN}
+#     plugins/TrackedVehiclePlugin.cc
+#     plugins/SimpleTrackedVehiclePlugin.cc 
+# )
+# target_link_libraries(
+#     ${CONTROL_PLUGIN} 
+#     ${catkin_LIBRARIES} 
+#     ${GAZEBO_LIBRARIES}
+# )
