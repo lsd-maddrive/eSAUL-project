@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(esaul_ad_helll)
+project(esaul_description)
 
 # Check for c++11 / c++0x support
 include(CheckCXXCompilerFlag)
@@ -26,7 +26,7 @@ link_directories(${GAZEBO_LIBRARY_DIRS})
 include_directories(${Boost_INCLUDE_DIR} ${catkin_INCLUDE_DIRS} ${GAZEBO_INCLUDE_DIRS})
 
 catkin_package(
-  DEPENDS
+    DEPENDS
     roscpp
     gazebo_ros
 )

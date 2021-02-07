@@ -141,10 +141,9 @@
 	<xacro:joint_wheel name="joint_right" child="link_right" origin_xyz="0 ${chassis_width/2+box_width/2} ${-track_rad}" />
     	
 	<gazebo>
-    		<plugin name="ModelPlugin" filename="libesaul_ad_helll.so" >
+    		<plugin name="ModelPlugin" filename="libesaul_description.so" >
       			<robotName>eSAUl</robotName>
    		 </plugin>
 	</gazebo>
-
 
  </robot>

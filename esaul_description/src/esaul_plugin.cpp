@@ -25,13 +25,6 @@ class ModelPush : public ModelPlugin
 		this->sdf = _sdf;
 		_joint_left= model->GetJoint("joint_left");
 		_joint_right = model->GetJoint("joint_right");
-		/*
-		wheel_joint_left_2 = model->GetJoint("joint_left_wheel_2");
-		wheel_joint_right_3 = model->GetJoint("joint_right_wheel_3");
-		wheel_joint_left_3 = model->GetJoint("joint_left_wheel_3");
-		wheel_joint_right_4 = model->GetJoint("joint_right_wheel_4");
-		wheel_joint_left_4 = model->GetJoint("joint_left_wheel_4");*/
-
 		if (sdf->HasElement("robotName"))
 		{
 			roboname = sdf->Get<std::string>("robotName");
@@ -48,12 +41,7 @@ class ModelPush : public ModelPlugin
 	}
 	void OnUpdate()
     	{	
-		_joint_right->SetVelocity(0, speed);
-		_joint_left->SetVelocity(0, -speed);
-		//i++;
-      		//wheel_joint_right_1->SetVelocity(0, lin_speed);
-		//wheel_joint_left_1->SetVelocity(0, lin_speed);
-		//const ignition::math::Vector3d contactWorldPosition(i, 0, 0);
+
     	}
 	void CmdVel(const geometry_msgs::Twist& command)
     	{
