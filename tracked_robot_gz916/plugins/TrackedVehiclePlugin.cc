@@ -1,25 +1,3 @@
-/*
- * Copyright (C) 2017 Open Source Robotics Foundation
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
-*/
-
-// #include <ignition/math/Vector3.hh>
-// #include <ignition/math/Pose3.hh>
-
-#include "gazebo/common/Assert.hh"
-// #include "gazebo/transport/transport.hh"
 #include "plugin_tracked.hh"
 
 using namespace gazebo;
@@ -37,18 +15,6 @@ class gazebo::TrackedVehiclePluginPrivate
 
   /// \brief SDF for this plugin;
   public: sdf::ElementPtr sdf;
-
-  // /// \brief Pointer to a node with robot prefix.
-  // public: transport::NodePtr robotNode;
-
-  // /// \brief Velocity command subscriber.
-  // public: transport::SubscriberPtr velocityPoseSub;
-
-  // /// \brief Velocity command subscriber.
-  // public: transport::SubscriberPtr velocityTwistSub;
-
-  // /// \brief Publisher of the track velocities.
-  // public: transport::PublisherPtr tracksVelocityPub;
 
   /// \brief Distance between the centers of the tracks.
   public: double tracksSeparation = 0.1;
@@ -128,29 +94,7 @@ void TrackedVehiclePlugin::Load(physics::ModelPtr _model,
 
 void TrackedVehiclePlugin::Init()
 {
-  // Initialize transport nodes.
 
-  // Prepend world name to robot namespace if it isn't absolute.
-  auto robotNamespace = this->GetRobotNamespace();
-  if (!robotNamespace.empty() && robotNamespace.at(0) != '/')
-  {
-    robotNamespace = this->dataPtr->model->GetWorld()->Name() +
-      "/" + robotNamespace;
-  }
-
-  // this->dataPtr->robotNode = transport::NodePtr(new transport::Node());
-  // this->dataPtr->robotNode->Init(robotNamespace);
-
-  // this->dataPtr->velocityPoseSub =
-  //     this->dataPtr->robotNode->Subscribe<msgs::Pose, TrackedVehiclePlugin>(
-  //         "~/cmd_vel", &TrackedVehiclePlugin::OnVelMsg, this);
-
-  // this->dataPtr->velocityTwistSub =
-  //     this->dataPtr->robotNode->Subscribe<msgs::Twist, TrackedVehiclePlugin>(
-  //         "~/cmd_vel_twist", &TrackedVehiclePlugin::OnVelMsg, this);
-
-  // this->dataPtr->tracksVelocityPub =
-  //   this->dataPtr->robotNode->Advertise<msgs::Vector2d>("~/tracks_speed", 1000);
 }
 
 void TrackedVehiclePlugin::Reset()
@@ -207,23 +151,6 @@ void TrackedVehiclePlugin::SetBodyVelocity(
   // Call the track velocity handler (which does the actual vehicle control).
   this->SetTrackVelocity(leftVelocity, rightVelocity);
 }
-
-// void TrackedVehiclePlugin::OnVelMsg(ConstPosePtr &_msg)
-// {
-//   if (!trackedVehiclePoseWarningIssued)
-//   {
-//     gzwarn << "Controlling tracked vehicles via Pose messages is deprecated. "
-//               "Use the Twist API via ~/cmd_vel_twist." << std::endl;
-//     trackedVehiclePoseWarningIssued = true;
-//   }
-//   const auto yaw = msgs::ConvertIgn(_msg->orientation()).Euler().Z();
-//   this->SetBodyVelocity(_msg->position().x(), yaw);
-// }
-
-// void TrackedVehiclePlugin::OnVelMsg(ConstTwistPtr &_msg)
-// {
-//   this->SetBodyVelocity(_msg->linear().x(), _msg->angular().z());
-// }
 
 std::string TrackedVehiclePlugin::GetRobotNamespace()
 {

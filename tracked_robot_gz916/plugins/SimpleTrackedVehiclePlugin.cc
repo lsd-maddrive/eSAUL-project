@@ -1,33 +1,13 @@
-/*
- * Copyright (C) 2017 Open Source Robotics Foundation
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
-*/
-
 #include <functional>
 #include <vector>
 
-#include <boost/version.hpp>
 
 // OpenDE private definitions; unfortunately, we need them
 #include "joints/contact.h"
 
-#include "gazebo/common/Assert.hh"
-#include "gazebo/transport/transport.hh"
-
 #include "SimpleTrackedVehiclePlugin.hh"
 
+#include <boost/version.hpp>
 
 #if BOOST_VERSION < 107400
 namespace std {
@@ -64,12 +44,10 @@ SimpleTrackedVehiclePlugin::~SimpleTrackedVehiclePlugin()
   }
 }
 
-
 void SimpleTrackedVehiclePlugin::onCmdVel(const geometry_msgs::Twist& command)
 {
     this->SetBodyVelocity(command.linear.x, command.angular.z);
 }
-
 
 void SimpleTrackedVehiclePlugin::Load(physics::ModelPtr _model,
                                       sdf::ElementPtr _sdf)
@@ -77,12 +55,8 @@ void SimpleTrackedVehiclePlugin::Load(physics::ModelPtr _model,
   GZ_ASSERT(_model, "SimpleTrackedVehiclePlugin: _model pointer is NULL");
   GZ_ASSERT(_sdf, "SimpleTrackedVehiclePlugin: _sdf pointer is NULL");
 
-  ROS_INFO("Start initialization");
-
   n_ = ros::NodeHandle("test_4_gazebo");
   sub_vel_cmd_ = n_.subscribe("cmd_vel", 1, &SimpleTrackedVehiclePlugin::onCmdVel, this);
-
-  ROS_INFO("ROS has been initialized!");
 
   if (_model->GetWorld()->Physics()->GetType() != "ode")
   {
@@ -122,8 +96,8 @@ void SimpleTrackedVehiclePlugin::Load(physics::ModelPtr _model,
   }
   else
   {
-    ROS_INFO_STREAM("SimpleTrackedVehiclePlugin: Successfully added robot body link: "
-          << this->body->GetName());
+    gzmsg << "SimpleTrackedVehiclePlugin: Successfully added robot body link: "
+          << this->body->GetName() << std::endl;
   }
 
   globalTracks.emplace(this->body,
@@ -142,8 +116,8 @@ void SimpleTrackedVehiclePlugin::Load(physics::ModelPtr _model,
   }
   else
   {
-    ROS_INFO_STREAM("SimpleTrackedVehiclePlugin: Successfully added left track link: "
-          << gtracks[Tracks::LEFT].at(0)->GetName());
+    gzmsg << "SimpleTrackedVehiclePlugin: Successfully added left track link: "
+          << gtracks[Tracks::LEFT].at(0)->GetName() << std::endl;
   }
 
   this->tracks[Tracks::RIGHT] = _model->GetLink(
@@ -160,51 +134,6 @@ void SimpleTrackedVehiclePlugin::Load(physics::ModelPtr _model,
     gzmsg << "SimpleTrackedVehiclePlugin: Successfully added right track link: "
         << gtracks[Tracks::RIGHT].at(0)->GetName() << std::endl;
   }
-
-  if (_sdf->HasElement("left_flipper"))
-  {
-    auto flipper = _sdf->GetElement("left_flipper");
-    while (flipper)
-    {
-      const auto flipperName = flipper->Get<std::string>();
-      const auto flipperLink = _model->GetLink(flipperName);
-      if (flipperLink == nullptr)
-      {
-        gzerr << "SimpleTrackedVehiclePlugin: <left_flipper> link '"
-              << flipperName << "' does not exist." << std::endl;
-      }
-      else
-      {
-        gtracks[Tracks::LEFT].push_back(flipperLink);
-        gzmsg << "SimpleTrackedVehiclePlugin: Successfully added left flipper "
-                 "link '" << flipperName << "'" << std::endl;
-      }
-      flipper = flipper->GetNextElement("left_flipper");
-    }
-  }
-
-  if (_sdf->HasElement("right_flipper"))
-  {
-    auto flipper = _sdf->GetElement("right_flipper");
-    while (flipper)
-    {
-      const auto flipperName = flipper->Get<std::string>();
-      const auto flipperLink = _model->GetLink(flipperName);
-      if (flipperLink == nullptr)
-      {
-        gzerr << "SimpleTrackedVehiclePlugin: <right_flipper> link '"
-              << flipperName << "' does not exist." << std::endl;
-      }
-      else
-      {
-        gtracks[Tracks::RIGHT].push_back(flipperLink);
-        gzmsg << "SimpleTrackedVehiclePlugin: Successfully added right flipper "
-                 "link '" << flipperName << "'" << std::endl;
-      }
-      flipper = flipper->GetNextElement("right_flipper");
-    }
-  }
-
 
   this->LoadParam(_sdf, "collide_without_contact_bitmask",
                   this->collideWithoutContactBitmask, 1u);
@@ -227,10 +156,6 @@ void SimpleTrackedVehiclePlugin::Init()
   // set the desired friction to tracks (override the values set in the
   // SDF model)
   this->UpdateTrackSurface();
-
-  // initialize Gazebo node, subscribers and publishers and event connections
-  this->node = transport::NodePtr(new transport::Node());
-  this->node->Init(model->GetWorld()->Name());
 
   this->beforePhysicsUpdateConnection =
       event::Events::ConnectBeforePhysicsUpdate(
