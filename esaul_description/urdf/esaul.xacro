@@ -2,28 +2,29 @@
 
 <robot name="eSAUl" xmlns:xacro="http://www.ros.org/wiki/xacro">
   
-  <xacro:property name="chassis_mass" value="5" />
+  <xacro:property name="chassis_mass" value="20" />
   <xacro:property name="chassis_length" value="0.45" />
   <xacro:property name="chassis_width" value="0.22" />
   <xacro:property name="chassis_height" value="0.13" />
 
-  <xacro:property name="track_mass" value="1" />
+  <xacro:property name="track_mass" value="0.3" />
   <xacro:property name="track_rad" value="0.04" />
   <xacro:property name="track_length" value="0.04" />
 
   <xacro:property name="box_length" value="0.4" />
   <xacro:property name="box_width" value="0.04" />
   <xacro:property name="box_height" value="0.08" />
+   <xacro:property name="wheel_mass" value="1" />
 
   <xacro:property name="wheel_friction" value="1.75" />
 
   <!-- INERTIAL MACROS -->
   <xacro:macro name="null_inertial">
     <inertial>
-      <mass value="0.001"/>
-      <inertia ixx="0.001" ixy="0" ixz="0"
-               iyy="0.001" iyz="0"
-               izz="0.001"/>
+      <mass value="0.01"/>
+      <inertia ixx="0.01" ixy="0" ixz="0"
+               iyy="0.01" iyz="0"
+               izz="0.01"/>
       </inertial>
   </xacro:macro>
 
@@ -40,7 +41,7 @@
     </inertial>
   </xacro:macro>
 
-  <xacro:macro name="solid_cylinder_inertial"
+  <!-- <xacro:macro name="solid_cylinder_inertial"
                params="r h mass *origin">
     <inertial>
       <xacro:insert_block name="origin"/>
@@ -49,7 +50,20 @@
                iyy="${mass / 12 * (3 * r * r + h * h)}" iyz="0.0"
                izz="${mass / 2 * r * r}" />
     </inertial>
+  </xacro:macro> -->
+
+    <xacro:macro name="solid_cylinder_inertial"
+               params="r h mass *origin">
+    <inertial>
+      <xacro:insert_block name="origin"/>
+      <mass value="${mass}"/>
+      <inertia ixx="${0.01 + (mass * h * h)/12 + (mass * r * r)/4}" ixy="0.0" ixz="0.0"
+               iyy="${0.01 + (mass * h * h)/12 + (mass * r * r)/4}" iyz="0.0"
+               izz="${0.01 + mass / 2 * r * r}" />
+    </inertial>
   </xacro:macro>
+
+
   <!-- INERTIAL MACROS END -->
 
   <link name="link_chassis">
@@ -71,79 +85,148 @@
       <origin xyz="0 0 0" rpy="0 0 0" />
     </xacro:solid_cuboid_inertial>
   </link>
+
   <xacro:macro name="link_track" params="name">
-   <link name="${name}">
-    <collision name="link_wheel_box">
-      <origin rpy="0 0 0" xyz="0 0 0"/>
-      <geometry>
-         <box size="${box_length} ${box_width} ${box_height}"/>
-      </geometry>
-    </collision>
-    <visual name="link_wheel_box">
-      <origin rpy="0 0 0" xyz="0 0 0"/>
-      <geometry>
-         <box size="${box_length} ${box_width} ${box_height}"/>
-      </geometry>
-    </visual>
-    <collision name="left_track_down">
-      <origin rpy="0 1.5708 1.5708" xyz="${-box_length/2} 0 0"/>
-      <geometry>
-         <cylinder length="${track_length}" radius="${track_rad}"/>
-      </geometry>
-    </collision>
-    <visual name="left_track_down">
-      <origin rpy="0 1.5708 1.5708" xyz="${-box_length/2} 0 0"/>
-      <geometry>
-         <cylinder length="${track_length}" radius="${track_rad}"/>
-      </geometry>
-    </visual>
-    <collision name="left_track_up">
-      <origin rpy="0 1.5708 1.5708" xyz="${box_length/2} 0 0"/>
-      <geometry>
-         <cylinder length="${track_length}" radius="${track_rad}"/>
-      </geometry>
-    </collision>
-    <visual name="left_track_up">
-      <origin rpy="0 1.5708 1.5708" xyz="${box_length/2} 0 0"/>
-      <geometry>
-         <cylinder length="${track_length}" radius="${track_rad}"/>
-      </geometry>
-    </visual>
-    <xacro:solid_cuboid_inertial
-          length="${chassis_length}" width="${chassis_width}"
-          height="${chassis_height}" mass="${chassis_mass}">
-      <origin xyz="0 0 0" rpy="0 0 0" />
-    </xacro:solid_cuboid_inertial>
-   </link>
+    <link name="${name}">
+      <collision name="collision_left_track">
+        <geometry>
+          <box size="${box_length} ${box_width} ${box_height}"/>
+        </geometry>
+      </collision>
+      <visual>
+        <origin rpy="0 0 0" xyz="0 0 0"/>
+        <geometry>
+          <box size="${box_length} ${box_width} ${box_height}"/>
+        </geometry>
+        <material name="black"/>
+      </visual>
+      <xacro:solid_cuboid_inertial
+            length="${box_length}" width="${box_width}"
+            height="${box_height}" mass="${track_mass}">
+        <origin xyz="0 0 0" rpy="0 0 0" />
+      </xacro:solid_cuboid_inertial>
+    </link>
     <gazebo reference="${name}">
-      <mu1>${wheel_friction}</mu1>
-      <mu2>${wheel_friction}</mu2>
+      <mu1>1</mu1>
+      <mu2>1</mu2>
       <material>Gazebo/Black</material>
-      <kp>10000000</kp>
-      <kd>1</kd>
     </gazebo>
   </xacro:macro>
 
-    <xacro:macro name="joint_wheel" params="name child origin_xyz">
-      <joint name="${name}" type="fixed">
-        <origin rpy="0 0 0" xyz="${origin_xyz}"/>
-        <child link="${child}"/>
-        <parent link="link_chassis"/>
-        <axis rpy="0 0 0" xyz="0 1 0"/>
-        <joint_properties damping="1.0" friction="1.0"/>
-      </joint>
-    </xacro:macro>
 
-	<xacro:link_track name="link_left" />
-	<xacro:joint_wheel name="joint_left" child="link_left" origin_xyz="0 ${-chassis_width/2-box_width/2} ${-track_rad}" />
-  
-	<xacro:link_track name="link_right" />
-	<xacro:joint_wheel name="joint_right" child="link_right" origin_xyz="0 ${chassis_width/2+box_width/2} ${-track_rad}" />
-    	
-	<gazebo>
+  <xacro:macro name="link_wheel" params="name">
+    <link name="${name}">
+      <xacro:solid_cylinder_inertial
+          r="${track_rad}" h="${track_length}"
+          mass="${wheel_mass}" >
+        <origin xyz="0 0 0" rpy="0 0 0" />
+      </xacro:solid_cylinder_inertial>
+      <collision name="link_right_wheel_collision">
+        <origin rpy="0 1.5707 1.5707" xyz="0 0 0"/>
+        <geometry>
+          <cylinder length="${track_length}" radius="${track_rad}"/>
+        </geometry>
+      </collision>
+      <visual name="${name}_visual">
+        <origin rpy="0 1.5707 1.5707" xyz="0 0 0"/>
+        <geometry>
+          <cylinder length="${track_length}" radius="${track_rad}"/>
+        </geometry>
+      </visual>
+    </link>
+    <gazebo reference="${name}">
+      <mu1>1.5</mu1>
+      <mu2>1.5</mu2>
+      <material>Gazebo/Black</material>
+      <!-- <kp>10000000</kp> -->
+      <!-- <kd>1</kd> -->
+    </gazebo>
+  </xacro:macro>
+
+  <xacro:macro name="joint_wheel_right" params="name child origin_xyz">
+    <joint name="${name}" type="continuous">
+      <origin rpy="0 0 0" xyz="${origin_xyz}"/>
+      <child link="${child}"/>
+      <parent link="link_right"/>
+      <axis rpy="0 0 0" xyz="0 1 0"/>
+      <limit effort="10000" velocity="1000"/>
+      <!-- <use_parent_model_frame>1</use_parent_model_frame> -->
+      <!-- <joint_properties damping="1.0" friction="1.0"/> -->
+    </joint>
+  </xacro:macro>
+
+    <xacro:macro name="joint_wheel_left" params="name child origin_xyz">
+    <joint name="${name}" type="continuous">
+      <origin rpy="0 0 0" xyz="${origin_xyz}"/>
+      <child link="${child}"/>
+      <parent link="link_left"/>
+      <axis rpy="0 0 0" xyz="0 1 0"/>
+      <limit effort="10000" velocity="1000"/>
+      <!-- <use_parent_model_frame>1</use_parent_model_frame> -->
+      <!-- <joint_properties damping="1.0" friction="1.0"/> -->
+    </joint>
+  </xacro:macro>
+
+  <xacro:macro name="joint_track" params="name child origin_xyz">
+    <joint name="${name}" type="fixed">
+      <origin rpy="0 0 0" xyz="${origin_xyz}"/>
+      <child link="${child}"/>
+      <parent link="link_chassis"/>
+      <axis rpy="0 0 0" xyz="0 1 0"/>
+      <joint_properties damping="1.0" friction="0.0"/>
+    </joint>
+  </xacro:macro>
+
+
+
+  <xacro:link_track name="link_right" />
+	<xacro:joint_track name="joint_right" child="link_right" origin_xyz="0 ${-chassis_width/2-box_width/2} ${-track_rad}" />
+
+  <xacro:link_wheel name="right_wheel_1" />
+	<xacro:joint_wheel_right name="joint_right_wheel_1" child="right_wheel_1" origin_xyz="${box_length/2} 0 0" />
+
+  <xacro:link_wheel name="right_wheel_2" />
+	<xacro:joint_wheel_right name="joint_right_wheel_2" child="right_wheel_2" origin_xyz="${box_length/6} 0 0" />
+
+  <xacro:link_wheel name="right_wheel_3" />
+	<xacro:joint_wheel_right name="joint_right_wheel_3" child="right_wheel_3" origin_xyz="${-box_length/6} 0 0" />
+
+  <xacro:link_wheel name="right_wheel_4" />
+	<xacro:joint_wheel_right name="joint_right_wheel_4" child="right_wheel_4" origin_xyz="${-box_length/2} 0 0" />
+
+
+
+  <xacro:link_track name="link_left" />
+	<xacro:joint_track name="joint_left" child="link_left" origin_xyz="0 ${chassis_width/2+box_width/2} ${-track_rad}" />
+
+  <xacro:link_wheel name="left_wheel_1" />
+	<xacro:joint_wheel_left name="joint_left_wheel_1" child="left_wheel_1" origin_xyz="${box_length/2} 0 0" />
+
+  <xacro:link_wheel name="left_wheel_2" />
+	<xacro:joint_wheel_left name="joint_left_wheel_2" child="left_wheel_2" origin_xyz="${box_length/6} 0 0" />
+
+  <xacro:link_wheel name="left_wheel_3" />
+	<xacro:joint_wheel_left name="joint_left_wheel_3" child="left_wheel_3" origin_xyz="${-box_length/6} 0 0" />
+
+  <xacro:link_wheel name="left_wheel_4" />
+	<xacro:joint_wheel_left name="joint_left_wheel_4" child="left_wheel_4" origin_xyz="${-box_length/2} 0 0" />
+
+
+  	<gazebo>
     		<plugin name="ModelPlugin" filename="libesaul_description.so" >
       			<robotName>eSAUl</robotName>
+            <joint_left1>joint_left_wheel_1</joint_left1>
+            <joint_right1>joint_right_wheel_1</joint_right1>
+            <joint_left2>joint_left_wheel_2</joint_left2>
+            <joint_right2>joint_right_wheel_2</joint_right2>
+            <joint_left3>joint_left_wheel_3</joint_left3>
+            <joint_right3>joint_right_wheel_3</joint_right3>
+            <joint_left4>joint_left_wheel_4</joint_left4>
+            <joint_right4>joint_right_wheel_4</joint_right4>
+            <width_chassis>${chassis_width}</width_chassis>
+            <link_r>link_right</link_r>
+            <link_l>link_left</link_l>
    		 </plugin>
 	</gazebo>
-
+  
  </robot>
