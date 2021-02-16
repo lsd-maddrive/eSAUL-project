@@ -8,12 +8,12 @@
   <xacro:property name="chassis_height" value="0.13" />
 
   <xacro:property name="track_mass" value="0.3" />
-  <xacro:property name="track_rad" value="0.04" />
+  <xacro:property name="track_rad" value="0.03" />
   <xacro:property name="track_length" value="0.04" />
 
   <xacro:property name="box_length" value="0.4" />
-  <xacro:property name="box_width" value="0.04" />
-  <xacro:property name="box_height" value="0.08" />
+  <xacro:property name="box_width" value="0.03" />
+  <xacro:property name="box_height" value="0.06" />
    <xacro:property name="wheel_mass" value="1" />
 
   <xacro:property name="wheel_friction" value="1.75" />
@@ -57,9 +57,9 @@
     <inertial>
       <xacro:insert_block name="origin"/>
       <mass value="${mass}"/>
-      <inertia ixx="${0.01 + (mass * h * h)/12 + (mass * r * r)/4}" ixy="0.0" ixz="0.0"
-               iyy="${0.01 + (mass * h * h)/12 + (mass * r * r)/4}" iyz="0.0"
-               izz="${0.01 + mass / 2 * r * r}" />
+      <inertia ixx="${(mass * h * h)/12 + (mass * r * r)/4}" ixy="0.0" ixz="0.0"
+               iyy="${(mass * h * h)/12 + (mass * r * r)/4}" iyz="0.0"
+               izz="${mass / 2 * r * r}" />
     </inertial>
   </xacro:macro>
 
@@ -107,8 +107,8 @@
       </xacro:solid_cuboid_inertial>
     </link>
     <gazebo reference="${name}">
-      <mu1>1</mu1>
-      <mu2>1</mu2>
+      <mu1>0</mu1>
+      <mu2>0</mu2>
       <material>Gazebo/Black</material>
     </gazebo>
   </xacro:macro>
