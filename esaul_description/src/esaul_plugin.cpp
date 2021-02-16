@@ -68,7 +68,7 @@ class ModelPush : public ModelPlugin
 			speed = command.linear.x;
 			// ang_speed = command.angular.z;
 			lin_speed_l = speed; 
-			lin_speed_r = lin_speed_l;
+			lin_speed_r = -lin_speed_l;
       	}
 	~ModelPush()
 		{

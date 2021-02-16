@@ -68,16 +68,16 @@
 
   <link name="link_chassis">
     <collision name="collision_chassis">
+      <!-- <origin rpy="0 0 0" xyz="0 0 ${track_rad}"/> -->
       <geometry>
         <box size="${chassis_length} ${chassis_width} ${chassis_height}"/>
       </geometry>
     </collision>
     <visual>
-      <origin rpy="0 0 0" xyz="0 0 ${track_rad}"/>
+      <!-- <origin rpy="0 0 0" xyz="0 0 ${track_rad}"/> -->
       <geometry>
         <box size="${chassis_length} ${chassis_width} ${chassis_height}"/>
       </geometry>
-      <material name="blue"/>
     </visual>
     <xacro:solid_cuboid_inertial
           length="${chassis_length}" width="${chassis_width}"
@@ -89,6 +89,7 @@
   <xacro:macro name="link_track" params="name">
     <link name="${name}">
       <collision name="collision_left_track">
+        <origin rpy="0 0 0" xyz="0 0 0"/>
         <geometry>
           <box size="${box_length} ${box_width} ${box_height}"/>
         </geometry>
@@ -138,8 +139,8 @@
       <mu1>1.5</mu1>
       <mu2>1.5</mu2>
       <material>Gazebo/Black</material>
-      <!-- <kp>10000000</kp> -->
-      <!-- <kd>1</kd> -->
+      <kp>10000000</kp>
+      <kd>1</kd>
     </gazebo>
   </xacro:macro>
 
@@ -180,7 +181,7 @@
 
 
   <xacro:link_track name="link_right" />
-	<xacro:joint_track name="joint_right" child="link_right" origin_xyz="0 ${-chassis_width/2-box_width/2} ${-track_rad}" />
+	<xacro:joint_track name="joint_right" child="link_right" origin_xyz="0 ${-chassis_width/2-box_width/2} ${-2*box_width}" />
 
   <xacro:link_wheel name="right_wheel_1" />
 	<xacro:joint_wheel_right name="joint_right_wheel_1" child="right_wheel_1" origin_xyz="${box_length/2} 0 0" />
@@ -197,7 +198,7 @@
 
 
   <xacro:link_track name="link_left" />
-	<xacro:joint_track name="joint_left" child="link_left" origin_xyz="0 ${chassis_width/2+box_width/2} ${-track_rad}" />
+	<xacro:joint_track name="joint_left" child="link_left" origin_xyz="0 ${chassis_width/2+box_width/2} ${-2*box_width}" />
 
   <xacro:link_wheel name="left_wheel_1" />
 	<xacro:joint_wheel_left name="joint_left_wheel_1" child="left_wheel_1" origin_xyz="${box_length/2} 0 0" />
