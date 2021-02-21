@@ -29,12 +29,9 @@ class ModelPush : public ModelPlugin
 		_joint_right2 = model->GetJoint("joint_right_wheel_2");
 		_joint_left3= model->GetJoint("joint_left_wheel_3");
 		_joint_right3 = model->GetJoint("joint_right_wheel_3");
-		_joint_left4= model->GetJoint("joint_left_wheel_4");
-		_joint_right4 = model->GetJoint("joint_right_wheel_4");
 		
 		sdf->GetElement("width_chassis")->GetValue()->Get(width);
-
-		cout << "His width is " << width << endl;
+		sdf->GetElement("wh_rad")->GetValue()->Get(rad);
 
 		if (sdf->HasElement("robotName"))
 		{
@@ -53,22 +50,19 @@ class ModelPush : public ModelPlugin
 	void OnUpdate()
     	{	
 			_joint_left1->SetVelocity(0, lin_speed_l);
-			_joint_left2->SetVelocity(0, lin_speed_l);
+			 _joint_left2->SetVelocity(0, lin_speed_l);
 			_joint_left3->SetVelocity(0, lin_speed_l);
-			_joint_left4->SetVelocity(0, lin_speed_l);
 
 			_joint_right1->SetVelocity(0, lin_speed_r);
 			_joint_right2->SetVelocity(0, lin_speed_r);
 			_joint_right3->SetVelocity(0, lin_speed_r);
-			_joint_right4->SetVelocity(0, lin_speed_r);
 
     	}
 	void CmdVel(const geometry_msgs::Twist& command)
     	{
-			speed = command.linear.x;
-			// ang_speed = command.angular.z;
-			lin_speed_l = speed; 
-			lin_speed_r = -lin_speed_l;
+			lin_speed_r = command.linear.x/rad + (command.angular.z*width/2)/rad;
+			lin_speed_l = command.linear.x/rad - (command.angular.z*width/2)/rad; 
+			
       	}
 	~ModelPush()
 		{
@@ -80,6 +74,7 @@ class ModelPush : public ModelPlugin
 	double lin_speed_l=0;
 	double speed=0;
 	double width=0;
+	double rad=0;
 	physics::ModelPtr model;
 	sdf::ElementPtr sdf;
 	std::string roboname;
@@ -93,8 +88,6 @@ class ModelPush : public ModelPlugin
 	physics::JointPtr _joint_right2;
 	physics::JointPtr _joint_left3;
 	physics::JointPtr _joint_right3;
-	physics::JointPtr _joint_left4;
-	physics::JointPtr _joint_right4;
 };
   
   GZ_REGISTER_MODEL_PLUGIN(ModelPush)

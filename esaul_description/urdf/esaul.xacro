@@ -11,10 +11,10 @@
   <xacro:property name="track_rad" value="0.03" />
   <xacro:property name="track_length" value="0.04" />
 
-  <xacro:property name="box_length" value="0.4" />
+  <xacro:property name="box_length" value="0.35" />
   <xacro:property name="box_width" value="0.03" />
   <xacro:property name="box_height" value="0.06" />
-   <xacro:property name="wheel_mass" value="1" />
+   <xacro:property name="wheel_mass" value="10" />
 
   <xacro:property name="wheel_friction" value="1.75" />
 
@@ -33,11 +33,11 @@
     <inertial>
       <xacro:insert_block name="origin"/>
       <mass value="${mass}"/>
-      <inertia ixx="${mass * (width * width + height * height) / 12}"
+      <inertia ixx="${0.01+ mass * (width * width + height * height) / 12}"
                ixy="0" ixz="0"
-               iyy="${mass * (length * length + height * height) / 12}"
+               iyy="${0.01+ mass * (length * length + height * height) / 12}"
                iyz="0"
-               izz="${mass * (width * width + length * length) / 12}"/>
+               izz="${0.01+ mass * (width * width + length * length) / 12}"/>
     </inertial>
   </xacro:macro>
 
@@ -85,6 +85,8 @@
       <origin xyz="0 0 0" rpy="0 0 0" />
     </xacro:solid_cuboid_inertial>
   </link>
+
+
 
   <xacro:macro name="link_track" params="name">
     <link name="${name}">
@@ -181,36 +183,30 @@
 
 
   <xacro:link_track name="link_right" />
-	<xacro:joint_track name="joint_right" child="link_right" origin_xyz="0 ${-chassis_width/2-box_width/2} ${-2*box_width}" />
+	<xacro:joint_track name="joint_right" child="link_right" origin_xyz="0 ${-chassis_width/2-box_width/1.5} ${-2*box_width}" />
 
   <xacro:link_wheel name="right_wheel_1" />
 	<xacro:joint_wheel_right name="joint_right_wheel_1" child="right_wheel_1" origin_xyz="${box_length/2} 0 0" />
 
   <xacro:link_wheel name="right_wheel_2" />
-	<xacro:joint_wheel_right name="joint_right_wheel_2" child="right_wheel_2" origin_xyz="${box_length/6} 0 0" />
+	<xacro:joint_wheel_right name="joint_right_wheel_2" child="right_wheel_2" origin_xyz="0 0 0" />
 
   <xacro:link_wheel name="right_wheel_3" />
-	<xacro:joint_wheel_right name="joint_right_wheel_3" child="right_wheel_3" origin_xyz="${-box_length/6} 0 0" />
-
-  <xacro:link_wheel name="right_wheel_4" />
-	<xacro:joint_wheel_right name="joint_right_wheel_4" child="right_wheel_4" origin_xyz="${-box_length/2} 0 0" />
+	<xacro:joint_wheel_right name="joint_right_wheel_3" child="right_wheel_3" origin_xyz="${-box_length/2} 0 0" />
 
 
 
   <xacro:link_track name="link_left" />
-	<xacro:joint_track name="joint_left" child="link_left" origin_xyz="0 ${chassis_width/2+box_width/2} ${-2*box_width}" />
+	<xacro:joint_track name="joint_left" child="link_left" origin_xyz="0 ${chassis_width/2+box_width/1.5} ${-2*box_width}" />
 
   <xacro:link_wheel name="left_wheel_1" />
 	<xacro:joint_wheel_left name="joint_left_wheel_1" child="left_wheel_1" origin_xyz="${box_length/2} 0 0" />
 
   <xacro:link_wheel name="left_wheel_2" />
-	<xacro:joint_wheel_left name="joint_left_wheel_2" child="left_wheel_2" origin_xyz="${box_length/6} 0 0" />
+	<xacro:joint_wheel_left name="joint_left_wheel_2" child="left_wheel_2" origin_xyz="0 0 0" />
 
   <xacro:link_wheel name="left_wheel_3" />
-	<xacro:joint_wheel_left name="joint_left_wheel_3" child="left_wheel_3" origin_xyz="${-box_length/6} 0 0" />
-
-  <xacro:link_wheel name="left_wheel_4" />
-	<xacro:joint_wheel_left name="joint_left_wheel_4" child="left_wheel_4" origin_xyz="${-box_length/2} 0 0" />
+	<xacro:joint_wheel_left name="joint_left_wheel_3" child="left_wheel_3" origin_xyz="${-box_length/2} 0 0" />
 
 
   	<gazebo>
@@ -222,11 +218,8 @@
             <joint_right2>joint_right_wheel_2</joint_right2>
             <joint_left3>joint_left_wheel_3</joint_left3>
             <joint_right3>joint_right_wheel_3</joint_right3>
-            <joint_left4>joint_left_wheel_4</joint_left4>
-            <joint_right4>joint_right_wheel_4</joint_right4>
             <width_chassis>${chassis_width}</width_chassis>
-            <link_r>link_right</link_r>
-            <link_l>link_left</link_l>
+            <wh_rad>${track_rad}</wh_rad>
    		 </plugin>
 	</gazebo>
   
