@@ -99,8 +99,8 @@ class ModelPush : public ModelPlugin
 	physics::JointPtr _joint_right3;
 	std_msgs::Float32 msg;
 	ros::Publisher odom_pub;
-	shared_ptr<tf::TransformBroadcaster> br;
-	ros::Time current_time = ros::Time::now();
+	//hared_ptr<tf::TransformBroadcaster> br;
+	//ros::Time current_time = ros::Time::now();
 };
   
   GZ_REGISTER_MODEL_PLUGIN(ModelPush)

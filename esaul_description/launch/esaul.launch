@@ -18,7 +18,7 @@
    <!-- TF stuff -->
         <!-- send fake joint values -->
         <node pkg="tf" type="static_transform_publisher" name="map_odom_broadcaster"
-      args="0 0 0 0 0 0 map odom 100"/>
+      args="0 0 0 0 0 0 map link_chassis 100"/>
          <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher">
                 <param name="use_gui" value="False"/>
          </node>
