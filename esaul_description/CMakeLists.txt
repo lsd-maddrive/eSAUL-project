@@ -17,6 +17,7 @@ endif()
 find_package(catkin REQUIRED COMPONENTS
   roscpp
   gazebo_ros
+  tf
 )
 
 # Depend on system install of Gazebo

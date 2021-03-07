@@ -37,11 +37,11 @@
     <inertial>
       <xacro:insert_block name="origin"/>
       <mass value="${mass}"/>
-      <inertia ixx="${0.01+ mass * (width * width + height * height) / 12}"
+      <inertia ixx="${mass * (width * width + height * height) / 12}"
                ixy="0" ixz="0"
-               iyy="${0.01+ mass * (length * length + height * height) / 12}"
+               iyy="${mass * (length * length + height * height) / 12}"
                iyz="0"
-               izz="${0.01+ mass * (width * width + length * length) / 12}"/>
+               izz="${mass * (width * width + length * length) / 12}"/>
     </inertial>
   </xacro:macro>
 
@@ -70,7 +70,7 @@
 
   <!-- INERTIAL MACROS END -->
 
-  <link name="link_chassis">
+  <link name="base_link">
     <collision name="collision_chassis">
       <!-- <origin rpy="0 0 0" xyz="0 0 ${track_rad}"/> -->
       <geometry>
@@ -178,7 +178,7 @@
     <joint name="${name}" type="fixed">
       <origin rpy="0 0 0" xyz="${origin_xyz}"/>
       <child link="${child}"/>
-      <parent link="link_chassis"/>
+      <parent link="base_link"/>
       <axis rpy="0 0 0" xyz="0 1 0"/>
       <joint_properties damping="1.0" friction="0.0"/>
     </joint>
@@ -209,7 +209,7 @@
 
   <joint name="laser_joint" type="fixed">
     <child link="laser_frame" />
-    <parent link="link_chassis" />
+    <parent link="base_link" />
     <origin xyz="0 0 ${chassis_height/2 + lidar_height/2}" />
   </joint>
 
@@ -244,7 +244,7 @@
     <material>Gazebo/Red</material>
     <sensor type="ray" name="head_hokuyo_sensor">
       <pose>0 0 0 0 0 0</pose>
-      <visualize>true</visualize>
+      <visualize>false</visualize>
       <update_rate>40</update_rate>
       <ray>
         <scan>
@@ -280,7 +280,7 @@
   <joint name="lidar_joint" type="fixed">
     <axis xyz="0 1 0" />
     <origin xyz="0 0 ${chassis_height/2 + lidar_height/2}" rpy="0 0 0"/>
-    <parent link="link_chassis"/>
+    <parent link="base_link"/>
     <child link="lidar_link"/>
   </joint>
 
