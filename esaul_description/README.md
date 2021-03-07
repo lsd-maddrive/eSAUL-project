@@ -12,10 +12,12 @@
     - число, где указана 1 отвечает за линейную скорость
     - число, где указана 2 отвечает за угловую скорость
 
-5. Получение карты
+5. Управление с клавиатуры: roslaunch esaul_description twist_key.launch
+
+6. Получение карты
     - Запуск лаунч файла: roslaunch esaul_description gmap.launch
-    - Сохранение карты: rosrun map_server map_saver -f test-1
-    test-1 - имя сохранения файла
+    - Сохранение карты: rosrun map_server map_saver -f test-1 (test-1 - имя сохранения файла)         
+ 
 
 ## Полезные ссылки 
 
