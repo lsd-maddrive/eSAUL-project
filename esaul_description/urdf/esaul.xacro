@@ -2,7 +2,7 @@
 
 <robot name="eSAUl" xmlns:xacro="http://www.ros.org/wiki/xacro">
   
-  <xacro:property name="chassis_mass" value="20" />
+  <xacro:property name="chassis_mass" value="40" />
   <xacro:property name="chassis_length" value="0.45" />
   <xacro:property name="chassis_width" value="0.22" />
   <xacro:property name="chassis_height" value="0.13" />
