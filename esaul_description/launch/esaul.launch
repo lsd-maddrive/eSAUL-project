@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <launch>
-        <!-- overwriting these args -->
+    
         <arg name="debug" default="false" />
         <arg name="gui" default="true" />
         <arg name="pause" default="false" />
@@ -9,28 +9,13 @@
 	<param name="robot_description" command="$(find xacro)/xacro '$(find esaul_description)/urdf/esaul.xacro'" />
 
     	<arg name="x" default="0"/>
-	<arg name="y" default="2"/>
+	<arg name="y" default="-2"/>
 	<arg name="z" default="0"/>
     
 	<node name="mybot_spawn" pkg="gazebo_ros" type="spawn_model" output="screen" args="-urdf -param robot_description -model robot -x $(arg x) -y $(arg y) -z $(arg z)" />
         <node name="rviz" pkg="rviz" type="rviz" args="-d $(find esaul_description)/config/rviz/esaul.rviz" />
-
-   <!-- TF stuff -->
-        <!-- send fake joint values -->
-         <node pkg="tf" type="static_transform_publisher" name="map_odom_broadcaster"
-      args="0 0 0 0 0 0 base_link lidar_link 100"/>
-
-         <!-- <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher">
-                <param name="use_gui" value="False"/>
-         </node> --> -->
-
         
-        <!-- <node name="robot_state_publisher" pkg="robot_state_publisher" type="state_publisher"/> -->
 
-        <include file="$(find esaul_description)/launch/lidar.launch">
-        <!-- All defaults -->
-        </include>		
-        <!-- include gazebo_ros launcher -->
         <include file="$(find gazebo_ros)/launch/empty_world.launch">
                 <arg name="world_name" value="$(find esaul_description)/worlds/esaul.world" />
                 <arg name="debug" value="$(arg debug)" />
@@ -39,8 +24,7 @@
                 <arg name="use_sim_time" value="true" />
         </include>
 
-
-
- 	
-
+        <include file="$(find esaul_description)/launch/lidar.launch">  </include>
+        <include file="$(find esaul_description)/launch/gmap.launch">  </include>
+        
 </launch>

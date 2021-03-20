@@ -66,8 +66,22 @@ Visualization Manager:
           Value: false
         lidar_link:
           Value: false
+        link_left:
+          Value: false
+        link_right:
+          Value: false
         map:
           Value: true
+        odom:
+          Value: true
+        support_wheel_left_1_link:
+          Value: false
+        support_wheel_left_2_link:
+          Value: false
+        support_wheel_right_1_link:
+          Value: false
+        support_wheel_right_2_link:
+          Value: false
       Marker Scale: 1
       Name: TF
       Show Arrows: true
@@ -75,11 +89,22 @@ Visualization Manager:
       Show Names: true
       Tree:
         map:
-          base_link:
-            laser_frame:
-              {}
-            lidar_link:
-              {}
+          odom:
+            base_link:
+              laser_frame:
+                {}
+              lidar_link:
+                {}
+              link_left:
+                support_wheel_left_1_link:
+                  {}
+                support_wheel_left_2_link:
+                  {}
+              link_right:
+                support_wheel_right_1_link:
+                  {}
+                support_wheel_right_2_link:
+                  {}
       Update Interval: 0
       Value: true
     - Alpha: 1
@@ -118,7 +143,7 @@ Visualization Manager:
       Draw Behind: false
       Enabled: true
       Name: Map
-      Topic: ""
+      Topic: /map
       Unreliable: false
       Use Timestamp: false
       Value: true

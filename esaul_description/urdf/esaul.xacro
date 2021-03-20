@@ -2,18 +2,20 @@
 
 <robot name="eSAUl" xmlns:xacro="http://www.ros.org/wiki/xacro">
   
+  <xacro:property name="M_PI" value="3.1415926535897931" />
+
   <xacro:property name="chassis_mass" value="40" />
   <xacro:property name="chassis_length" value="0.45" />
   <xacro:property name="chassis_width" value="0.22" />
   <xacro:property name="chassis_height" value="0.13" />
 
   <xacro:property name="track_mass" value="0.3" />
-  <xacro:property name="track_rad" value="0.03" />
-  <xacro:property name="track_length" value="0.04" />
+  <xacro:property name="track_rad" value="0.04" />
+  <xacro:property name="track_length" value="0.03" />
 
-  <xacro:property name="box_length" value="0.35" />
+  <xacro:property name="box_length" value="0.4" />
   <xacro:property name="box_width" value="0.03" />
-  <xacro:property name="box_height" value="0.06" />
+  <xacro:property name="box_height" value="0.08" />
   <xacro:property name="wheel_mass" value="10" />
 
   <xacro:property name="lidar_mass" value="0.1" />
@@ -32,6 +34,15 @@
       </inertial>
   </xacro:macro>
 
+  <xacro:macro name="default_inertial" params="mass">
+    <inertial>
+      <mass value="${mass}" />
+    <inertia ixx="1.0" ixy="0.0" ixz="0.0"
+             iyy="1.0" iyz="0.0"
+             izz="1.0" />
+    </inertial>
+  </xacro:macro>
+
   <xacro:macro name="solid_cuboid_inertial"
                params="width length height mass *origin">
     <inertial>
@@ -45,16 +56,6 @@
     </inertial>
   </xacro:macro>
 
-  <!-- <xacro:macro name="solid_cylinder_inertial"
-               params="r h mass *origin">
-    <inertial>
-      <xacro:insert_block name="origin"/>
-      <mass value="${mass}"/>
-      <inertia ixx="${mass / 12 * (3 * r * r + h * h)}" ixy="0.0" ixz="0.0"
-               iyy="${mass / 12 * (3 * r * r + h * h)}" iyz="0.0"
-               izz="${mass / 2 * r * r}" />
-    </inertial>
-  </xacro:macro> -->
 
     <xacro:macro name="solid_cylinder_inertial"
                params="r h mass *origin">
@@ -95,13 +96,13 @@
   <xacro:macro name="link_track" params="name">
     <link name="${name}">
       <collision name="collision_left_track">
-        <origin rpy="0 0 0" xyz="0 0 0"/>
+        <origin rpy="0 0 0" xyz="0 0 0.01"/>
         <geometry>
           <box size="${box_length} ${box_width} ${box_height}"/>
         </geometry>
       </collision>
       <visual>
-        <origin rpy="0 0 0" xyz="0 0 0"/>
+        <origin rpy="0 0 0" xyz="0 0 0.01"/>
         <geometry>
           <box size="${box_length} ${box_width} ${box_height}"/>
         </geometry>
@@ -142,8 +143,8 @@
       </visual>
     </link>
     <gazebo reference="${name}">
-      <mu1>1.5</mu1>
-      <mu2>1.5</mu2>
+      <mu1>3</mu1>
+      <mu2>3</mu2>
       <material>Gazebo/Black</material>
       <kp>10000000</kp>
       <kd>1</kd>
@@ -157,8 +158,6 @@
       <parent link="link_right"/>
       <axis rpy="0 0 0" xyz="0 1 0"/>
       <limit effort="10000" velocity="1000"/>
-      <!-- <use_parent_model_frame>1</use_parent_model_frame> -->
-      <!-- <joint_properties damping="1.0" friction="1.0"/> -->
     </joint>
   </xacro:macro>
 
@@ -169,8 +168,6 @@
       <parent link="link_left"/>
       <axis rpy="0 0 0" xyz="0 1 0"/>
       <limit effort="10000" velocity="1000"/>
-      <!-- <use_parent_model_frame>1</use_parent_model_frame> -->
-      <!-- <joint_properties damping="1.0" friction="1.0"/> -->
     </joint>
   </xacro:macro>
 
@@ -183,42 +180,7 @@
       <joint_properties damping="1.0" friction="0.0"/>
     </joint>
   </xacro:macro>
-<!-- 
-  <link name="laser_frame">
-    <xacro:solid_cylinder_inertial
-        r="${lidar_radius}" h="${lidar_height}"
-        mass="${lidar_mass}" >
-      <origin xyz="0 0 0" rpy="0 0 0" />
-    </xacro:solid_cylinder_inertial>
-    <collision>
-      <origin xyz="0 0 0" rpy="0 0 0" />
-      <geometry>
-        <cylinder length="${lidar_height}" radius="${lidar_radius}"/>
-      </geometry>
-    </collision>
-    <visual>
-      <origin xyz="0 0 0" rpy="0 0 0" />
-      <geometry>
-        <cylinder length="${lidar_height}" radius="${lidar_radius}"/>
-      </geometry>
-    </visual>
-  </link>
-  <gazebo reference="laser_frame">
-    <material>Gazebo/Red</material>
-  </gazebo>
 
-  <joint name="laser_joint" type="fixed">
-    <child link="laser_frame" />
-    <parent link="base_link" />
-    <origin xyz="0 0 ${chassis_height/2 + lidar_height/2}" />
-  </joint>
-
-
- -->
-
-
-
-  <!-- Hokuyo Laser -->
   <link name="lidar_link">
     <xacro:solid_cylinder_inertial
         r="${lidar_radius}" h="${lidar_height}"
@@ -262,17 +224,13 @@
         </range>
         <noise>
           <type>gaussian</type>
-          <!-- Noise parameters based on published spec for Hokuyo laser
-               achieving "+-30mm" accuracy at range < 10m.  A mean of 0.0m and
-               stddev of 0.01m will put 99.7% of samples within 0.03m of the true
-               reading. -->
           <mean>0.0</mean>
           <stddev>0.01</stddev>
         </noise>
       </ray>
       <plugin name="gazebo_ros_head_hokuyo_controller" filename="libgazebo_ros_laser.so">
         <topicName>/eSAUl/laser/scan</topicName>
-        <frameName>lidar_link</frameName>
+        <frameName>laser_frame</frameName>
       </plugin>
     </sensor>
   </gazebo>
@@ -286,44 +244,67 @@
 
 
 
+ <xacro:macro name="support_wheel" params="parent location *origin">
+    <link name="support_wheel_${location}_link">
+      <visual>
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <geometry>
+          <mesh filename="package://caster_description/mesh/support_wheel.stl" />
+        </geometry>
+        <material name="">
+          <color rgba="0.3 0.3 0.3 1.0" />>
+        </material>
+      </visual>
+      <collision>
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <geometry>
+          <mesh filename="package://caster_description/mesh/support_wheel.stl" />
+        </geometry>
+      </collision>
+      <xacro:default_inertial mass="5" />
+    </link>
 
+    <joint name="support_wheel_${location}_joint" type="fixed">
+      <xacro:insert_block name="origin" />
+      <parent link="${parent}" />
+      <child link="support_wheel_${location}_link" />
+      <!-- <axis xyz="0 0 1" /> -->
+    </joint>
+  </xacro:macro>
 
   <xacro:link_track name="link_right" />
 	<xacro:joint_track name="joint_right" child="link_right" origin_xyz="0 ${-chassis_width/2-box_width/1.5} ${-2*box_width}" />
 
-  <xacro:link_wheel name="right_wheel_1" />
-	<xacro:joint_wheel_right name="joint_right_wheel_1" child="right_wheel_1" origin_xyz="${box_length/2} 0 0" />
-
-  <xacro:link_wheel name="right_wheel_2" />
-	<xacro:joint_wheel_right name="joint_right_wheel_2" child="right_wheel_2" origin_xyz="0 0 0" />
-
-  <xacro:link_wheel name="right_wheel_3" />
-	<xacro:joint_wheel_right name="joint_right_wheel_3" child="right_wheel_3" origin_xyz="${-box_length/2} 0 0" />
-
-
+  <xacro:link_wheel name="right_wheel" />
+	<xacro:joint_wheel_right name="joint_right_wheel" child="right_wheel" origin_xyz="0 0 0" />
 
   <xacro:link_track name="link_left" />
 	<xacro:joint_track name="joint_left" child="link_left" origin_xyz="0 ${chassis_width/2+box_width/1.5} ${-2*box_width}" />
 
-  <xacro:link_wheel name="left_wheel_1" />
-	<xacro:joint_wheel_left name="joint_left_wheel_1" child="left_wheel_1" origin_xyz="${box_length/2} 0 0" />
+  <xacro:link_wheel name="left_wheel" />
+	<xacro:joint_wheel_left name="joint_left_wheel" child="left_wheel" origin_xyz="0 0 0" />
 
-  <xacro:link_wheel name="left_wheel_2" />
-	<xacro:joint_wheel_left name="joint_left_wheel_2" child="left_wheel_2" origin_xyz="0 0 0" />
+  <xacro:support_wheel parent="link_left" location="left_1">
+    <origin xyz="${box_length/2} 0 0.028" rpy="0 0 0" />
+  </xacro:support_wheel>
 
-  <xacro:link_wheel name="left_wheel_3" />
-	<xacro:joint_wheel_left name="joint_left_wheel_3" child="left_wheel_3" origin_xyz="${-box_length/2} 0 0" />
+  <xacro:support_wheel parent="link_left" location="left_2">
+    <origin xyz="${-box_length/2} 0 0.028" rpy="0 0 0" />
+  </xacro:support_wheel>
 
+  <xacro:support_wheel parent="link_right" location="right_1">
+    <origin xyz="${box_length/2} 0 0.028" rpy="0 0 0" />
+  </xacro:support_wheel>
 
-  	<gazebo>
+  <xacro:support_wheel parent="link_right" location="right_2">
+    <origin xyz="${-box_length/2} 0 0.028" rpy="0 0 0" />
+  </xacro:support_wheel>
+
+  <gazebo>
     		<plugin name="ModelPlugin" filename="libesaul_description.so" >
-      			<robotName>eSAUl</robotName>
-            <joint_left1>joint_left_wheel_1</joint_left1>
-            <joint_right1>joint_right_wheel_1</joint_right1>
-            <joint_left2>joint_left_wheel_2</joint_left2>
-            <joint_right2>joint_right_wheel_2</joint_right2>
-            <joint_left3>joint_left_wheel_3</joint_left3>
-            <joint_right3>joint_right_wheel_3</joint_right3>
+      		<robotName>eSAUl</robotName>
+            <joint_left>joint_left_wheel</joint_left>
+            <joint_right>joint_right_wheel</joint_right>
             <width_chassis>${chassis_width}</width_chassis>
             <wh_rad>${track_rad}</wh_rad>
    		 </plugin>

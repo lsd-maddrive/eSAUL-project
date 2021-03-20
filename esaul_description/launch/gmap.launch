@@ -1,8 +1,10 @@
 <launch>
-  <arg name="scan_topic"  default="/eSAUl/laser/scan" />
-  <arg name="base_frame"  default="base_link"/>
-  <arg name="odom_frame"  default="/eSAUl/odom"/>
   
+  <arg name="base_frame" default="base_link"/>
+  <arg name="odom_frame" default="odom"/>
+  <arg name="map_frame"  default="map"/>
+  <arg name="scan_topic" default="/eSAUl/laser/scan" />
+
   <node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher">
   </node>
 
