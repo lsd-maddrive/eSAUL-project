@@ -7,14 +7,18 @@
         <arg name="world" default="$(find esaul_description)/worlds/esaul.world" />
 	
 	<param name="robot_description" command="$(find xacro)/xacro '$(find esaul_description)/urdf/esaul.xacro'" />
+        <node name="rviz" pkg="rviz" type="rviz" args="-d $(find esaul_software)/config/rviz/esaul.rviz" />
 
     	<arg name="x" default="0"/>
 	<arg name="y" default="-2"/>
 	<arg name="z" default="0"/>
     
-	<node name="mybot_spawn" pkg="gazebo_ros" type="spawn_model" output="screen" args="-urdf -param robot_description -model robot -x $(arg x) -y $(arg y) -z $(arg z)" />
-        <node name="rviz" pkg="rviz" type="rviz" args="-d $(find esaul_description)/config/rviz/esaul.rviz" />
+        <node name="robot_state_publisher" pkg="robot_state_publisher" type="state_publisher" respawn="false" output="screen">
+                <param name="robot_description" command="$(find xacro)/xacro '$(find esaul_description)/urdf/esaul.xacro'"/>
+                <remap from="/joint_states" to="/eSAUl/joint_states" />
+        </node>  
         
+        <node name="mybot_spawn" pkg="gazebo_ros" type="spawn_model" output="screen" args="-urdf -param robot_description -model robot -x $(arg x) -y $(arg y) -z $(arg z)" />
 
         <include file="$(find gazebo_ros)/launch/empty_world.launch">
                 <arg name="world_name" value="$(find esaul_description)/worlds/esaul.world" />
@@ -24,7 +28,10 @@
                 <arg name="use_sim_time" value="true" />
         </include>
 
-        <include file="$(find esaul_description)/launch/lidar.launch">  </include>
-        <include file="$(find esaul_description)/launch/gmap.launch">  </include>
+        <include file="$(find esaul_software)/launch/gmap.launch">  </include>
+        <include file="$(find esaul_software)/launch/lidar.launch">  </include>
+        <include file="$(find esaul_software)/launch/move_base.launch">  </include>
+        <include file="$(find esaul_software)/launch/control.launch">  </include>
+
         
 </launch>

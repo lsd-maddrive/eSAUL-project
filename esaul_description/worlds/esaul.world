@@ -8,7 +8,7 @@
       <uri>model://sun</uri>
     </include>
     <include>
-      <uri>model://turtlebot3_world</uri>
+      <uri>model://iscas_museum</uri>
     </include>
     <gui fullscreen='0'>
       <camera name='user_camera'>
