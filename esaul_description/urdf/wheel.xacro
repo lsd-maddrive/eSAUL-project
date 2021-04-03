@@ -1,0 +1,97 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <xacro:property name="wheel_mass" value="10" />
+  <xacro:property name="track_rad" value="0.04" />
+  <xacro:property name="track_length" value="0.03" />
+
+   <xacro:macro name="solid_cylinder_inertial"
+               params="r h mass *origin">
+    <inertial>
+      <xacro:insert_block name="origin"/>
+      <mass value="${mass}"/>
+      <inertia ixx="${(mass * h * h)/12 + (mass * r * r)/4}" ixy="0.0" ixz="0.0"
+               iyy="${(mass * h * h)/12 + (mass * r * r)/4}" iyz="0.0"
+               izz="${mass / 2 * r * r}" />
+    </inertial>
+  </xacro:macro>
+
+
+  <xacro:macro name="link_wheel" params="name">
+    <link name="${name}">
+      <xacro:solid_cylinder_inertial
+          r="${track_rad}" h="${track_length}"
+          mass="${wheel_mass}" >
+        <origin xyz="0 0 0" rpy="0 0 0" />
+      </xacro:solid_cylinder_inertial>
+      <collision name="link_right_wheel_collision">
+        <origin rpy="0 1.5707 1.5707" xyz="0 0 0"/>
+        <geometry>
+          <cylinder length="${track_length}" radius="${track_rad}"/>
+        </geometry>
+      </collision>
+      <visual name="${name}_visual">
+        <origin rpy="0 1.5707 1.5707" xyz="0 0 0"/>
+        <geometry>
+          <cylinder length="${track_length}" radius="${track_rad}"/>
+        </geometry>
+      </visual>
+    </link>
+    <gazebo reference="${name}">
+      <mu1>3</mu1>
+      <mu2>3</mu2>
+      <material>Gazebo/Black</material>
+      <kp>10000000</kp>
+      <kd>1</kd>
+    </gazebo>
+  </xacro:macro>
+
+  <xacro:macro name="joint_wheel_right" params="name child origin_xyz">
+    <joint name="${name}" type="continuous">
+      <origin rpy="0 0 0" xyz="${origin_xyz}"/>
+      <child link="${child}"/>
+      <parent link="link_right"/>
+      <axis rpy="0 0 0" xyz="0 1 0"/>
+      <limit effort="10000" velocity="1000"/>
+    </joint>
+  </xacro:macro>
+
+    <xacro:macro name="joint_wheel_left" params="name child origin_xyz">
+    <joint name="${name}" type="continuous">
+      <origin rpy="0 0 0" xyz="${origin_xyz}"/>
+      <child link="${child}"/>
+      <parent link="link_left"/>
+      <axis rpy="0 0 0" xyz="0 1 0"/>
+      <limit effort="10000" velocity="1000"/>
+    </joint>
+  </xacro:macro>
+
+ <xacro:macro name="support_wheel" params="parent location *origin">
+    <link name="support_wheel_${location}_link">
+      <visual>
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <geometry>
+          <mesh filename="package://caster_description/mesh/support_wheel.stl" />
+        </geometry>
+        <material name="">
+          <color rgba="0.3 0.3 0.3 1.0" />>
+        </material>
+      </visual>
+      <collision>
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <geometry>
+          <mesh filename="package://caster_description/mesh/support_wheel.stl" />
+        </geometry>
+      </collision>
+      <xacro:default_inertial mass="5" />
+    </link>
+
+   <joint name="support_wheel_${location}_joint" type="fixed">
+      <xacro:insert_block name="origin" />
+      <parent link="${parent}" />
+      <child link="support_wheel_${location}_link" />
+      <!-- <axis xyz="0 0 1" /> -->
+    </joint>
+  </xacro:macro>
+
+</robot>

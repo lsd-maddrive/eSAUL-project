@@ -1,0 +1,71 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <xacro:property name="track_mass" value="0.3" />
+  <xacro:property name="box_length" value="0.4" />
+  <xacro:property name="box_width" value="0.03" />
+  <xacro:property name="box_height" value="0.08" />
+  
+
+  <xacro:macro name="null_inertial">
+    <inertial>
+      <mass value="0.01"/>
+      <inertia ixx="0.01" ixy="0" ixz="0"
+               iyy="0.01" iyz="0"
+               izz="0.01"/>
+      </inertial>
+  </xacro:macro>
+
+   <xacro:macro name="solid_cuboid_inertial"
+               params="width length height mass *origin">
+    <inertial>
+      <xacro:insert_block name="origin"/>
+      <mass value="${mass}"/>
+      <inertia ixx="${mass * (width * width + height * height) / 12}"
+               ixy="0" ixz="0"
+               iyy="${mass * (length * length + height * height) / 12}"
+               iyz="0"
+               izz="${mass * (width * width + length * length) / 12}"/>
+    </inertial>
+  </xacro:macro>
+
+
+   <xacro:macro name="link_track" params="name">
+    <link name="${name}">
+      <collision name="collision_left_track">
+        <origin rpy="0 0 0" xyz="0 0 0.01"/>
+        <geometry>
+          <box size="${box_length} ${box_width} ${box_height}"/>
+        </geometry>
+      </collision>
+      <visual>
+        <origin rpy="0 0 0" xyz="0 0 0.01"/>
+        <geometry>
+          <box size="${box_length} ${box_width} ${box_height}"/>
+        </geometry>
+        <material name="black"/>
+      </visual>
+      <xacro:solid_cuboid_inertial
+            length="${box_length}" width="${box_width}"
+            height="${box_height}" mass="${track_mass}">
+        <origin xyz="0 0 0" rpy="0 0 0" />
+      </xacro:solid_cuboid_inertial>
+    </link>
+    <gazebo reference="${name}">
+      <mu1>0</mu1>
+      <mu2>0</mu2>
+      <material>Gazebo/Black</material>
+    </gazebo>
+  </xacro:macro>
+
+  <xacro:macro name="joint_track" params="name child origin_xyz">
+    <joint name="${name}" type="fixed">
+      <origin rpy="0 0 0" xyz="${origin_xyz}"/>
+      <child link="${child}"/>
+      <parent link="base_link"/>
+      <axis rpy="0 0 0" xyz="0 1 0"/>
+      <joint_properties damping="1.0" friction="0.0"/>
+    </joint>
+  </xacro:macro>
+
+</robot>
