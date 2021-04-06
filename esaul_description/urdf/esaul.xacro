@@ -4,7 +4,7 @@
   
   <xacro:include filename="$(find esaul_description)/urdf/track.xacro" />
   <xacro:include filename="$(find esaul_description)/urdf/wheel.xacro" />
-  <xacro:include filename="$(find esaul_software)/urdf/lidar.xacro" />
+  <xacro:include filename="$(find esaul_description)/urdf/lidar.xacro" />
 
   <xacro:property name="M_PI" value="3.1415926535897931" />
 

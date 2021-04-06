@@ -1,5 +1,6 @@
 base_global_planner: "global_planner/GlobalPlanner"
 base_local_planner: "dwa_local_planner/DWAPlannerROS"
+# base_local_planner: eband_local_planner/EBandPlannerROS
 
 recovery_behaviors: #[]
   - name: conservative_reset

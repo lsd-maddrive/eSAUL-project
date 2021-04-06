@@ -7,11 +7,10 @@
         <arg name="world" default="$(find esaul_description)/worlds/esaul.world" />
 	
 	<param name="robot_description" command="$(find xacro)/xacro '$(find esaul_description)/urdf/esaul.xacro'" />
-        <node name="rviz" pkg="rviz" type="rviz" args="-d $(find esaul_software)/config/rviz/esaul.rviz" />
 
     	<arg name="x" default="0"/>
 	<arg name="y" default="-2"/>
-	<arg name="z" default="0"/>
+	<arg name="z" default="2"/>
     
         <node name="robot_state_publisher" pkg="robot_state_publisher" type="state_publisher" respawn="false" output="screen">
                 <param name="robot_description" command="$(find xacro)/xacro '$(find esaul_description)/urdf/esaul.xacro'"/>
@@ -28,10 +27,8 @@
                 <arg name="use_sim_time" value="true" />
         </include>
 
-        <include file="$(find esaul_software)/launch/gmap.launch">  </include>
-        <include file="$(find esaul_software)/launch/lidar.launch">  </include>
-        <include file="$(find esaul_software)/launch/move_base.launch">  </include>
-        <include file="$(find esaul_software)/launch/control.launch">  </include>
+
+
 
         
 </launch>
