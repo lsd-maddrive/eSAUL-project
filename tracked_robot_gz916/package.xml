@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>tracked_robot_gz916</name>
+  <version>0.0.0</version>
+  <description>The robot_gazebo package</description>
+  <maintainer email="user@todo.todo">user</maintainer>
+
+  <license>TODO</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+  <build_depend>gazebo_ros</build_depend>
+  <build_depend>roscpp</build_depend>
+  <exec_depend>gazebo_ros</exec_depend>
+  <exec_depend>roscpp</exec_depend>
+
+  <!-- The export tag contains other, unspecified, tags -->
+  <export>
+    <gazebo_ros plugin_path="${prefix}/lib" gazebo_media_path="${prefix}" />
+  </export>
+</package>

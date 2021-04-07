@@ -1,0 +1,117 @@
+<?xml version="1.0" ?>
+
+<robot name="eSAUl" xmlns:xacro="http://www.ros.org/wiki/xacro">
+  
+  <xacro:include filename="$(find esaul_description)/urdf/track.xacro" />
+  <xacro:include filename="$(find esaul_description)/urdf/wheel.xacro" />
+  <xacro:include filename="$(find esaul_description)/urdf/lidar.xacro" />
+
+  <xacro:property name="M_PI" value="3.1415926535897931" />
+
+  <xacro:property name="chassis_mass" value="40" />
+  <xacro:property name="chassis_length" value="0.45" />
+  <xacro:property name="chassis_width" value="0.22" />
+  <xacro:property name="chassis_height" value="0.13" />
+
+
+ 
+
+  <xacro:property name="wheel_friction" value="1.75" />
+
+  <!-- INERTIAL MACROS -->
+  <xacro:macro name="null_inertial">
+    <inertial>
+      <mass value="0.01"/>
+      <inertia ixx="0.01" ixy="0" ixz="0"
+               iyy="0.01" iyz="0"
+               izz="0.01"/>
+      </inertial>
+  </xacro:macro>
+
+  <xacro:macro name="default_inertial" params="mass">
+    <inertial>
+      <mass value="${mass}" />
+    <inertia ixx="1.0" ixy="0.0" ixz="0.0"
+             iyy="1.0" iyz="0.0"
+             izz="1.0" />
+    </inertial>
+  </xacro:macro>
+
+
+
+  <xacro:macro name="solid_cuboid_inertial"
+               params="width length height mass *origin">
+    <inertial>
+      <xacro:insert_block name="origin"/>
+      <mass value="${mass}"/>
+      <inertia ixx="${mass * (width * width + height * height) / 12}"
+               ixy="0" ixz="0"
+               iyy="${mass * (length * length + height * height) / 12}"
+               iyz="0"
+               izz="${mass * (width * width + length * length) / 12}"/>
+    </inertial>
+  </xacro:macro>
+
+
+  <!-- INERTIAL MACROS END -->
+
+  <link name="base_link">
+    <collision name="collision_chassis">
+      <!-- <origin rpy="0 0 0" xyz="0 0 ${track_rad}"/> -->
+      <geometry>
+        <box size="${chassis_length} ${chassis_width} ${chassis_height}"/>
+      </geometry>
+    </collision>
+    <visual>
+      <!-- <origin rpy="0 0 0" xyz="0 0 ${track_rad}"/> -->
+      <geometry>
+        <box size="${chassis_length} ${chassis_width} ${chassis_height}"/>
+      </geometry>
+    </visual>
+    <xacro:solid_cuboid_inertial
+          length="${chassis_length}" width="${chassis_width}"
+          height="${chassis_height}" mass="${chassis_mass}">
+      <origin xyz="0 0 0" rpy="0 0 0" />
+    </xacro:solid_cuboid_inertial>
+  </link>
+
+
+  <xacro:link_track name="link_right" />
+	<xacro:joint_track name="joint_right" child="link_right" origin_xyz="0 ${-chassis_width/2-box_width/1.5} ${-2*box_width}" />
+
+  <xacro:link_wheel name="right_wheel" />
+	<xacro:joint_wheel_right name="joint_right_wheel" child="right_wheel" origin_xyz="0 0 0" />
+
+  <xacro:link_track name="link_left" />
+	<xacro:joint_track name="joint_left" child="link_left" origin_xyz="0 ${chassis_width/2+box_width/1.5} ${-2*box_width}" />
+
+  <xacro:link_wheel name="left_wheel" />
+	<xacro:joint_wheel_left name="joint_left_wheel" child="left_wheel" origin_xyz="0 0 0" />
+
+  <xacro:support_wheel parent="link_left" location="left_1">
+    <origin xyz="${box_length/2} 0 0.028" rpy="0 0 0" />
+  </xacro:support_wheel>
+
+  <xacro:support_wheel parent="link_left" location="left_2">
+    <origin xyz="${-box_length/2} 0 0.028" rpy="0 0 0" />
+  </xacro:support_wheel>
+
+  <xacro:support_wheel parent="link_right" location="right_1">
+    <origin xyz="${box_length/2} 0 0.028" rpy="0 0 0" />
+  </xacro:support_wheel>
+
+  <xacro:support_wheel parent="link_right" location="right_2">
+    <origin xyz="${-box_length/2} 0 0.028" rpy="0 0 0" />
+  </xacro:support_wheel>
+
+  <gazebo>
+    		<plugin name="ModelPlugin" filename="libesaul_plugin.so" >
+      		<robotName>eSAUl</robotName>
+            <joint_left>joint_left_wheel</joint_left>
+            <joint_right>joint_right_wheel</joint_right>
+            <width_chassis>${chassis_width}</width_chassis>
+            <wh_rad>${track_rad}</wh_rad>
+   		 </plugin>
+	</gazebo>
+  
+ </robot>
