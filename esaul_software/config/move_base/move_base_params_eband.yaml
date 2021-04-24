@@ -1,0 +1,47 @@
+base_global_planner: "global_planner/GlobalPlanner"
+base_local_planner: eband_local_planner/EBandPlannerROS
+
+controller_frequency: 20.
+planner_frequency: 0.  # 0. is only plan on a new goal or when local planner fails
+planner_patience: 5.
+controller_patience: 15.
+recovery_behavior_enables: true
+shutdown_costmaps: false
+oscillation_timeout: 0.  # 0. is infinite
+oscillation_distance: 0.5
+map_planning_retries: -1.  # -1 is infinite
+
+# Planners
+GlobalPlanner:
+  allow_unknown: true
+  default_tolerance: 0.
+  visualize_potential: true
+  use_dijkstra: true  # although A* is faster, implementation pecularities here make it undesirable
+  use_quadratic: true
+  use_grid_path: false
+  old_navfn_behavior: false
+  lethal_cost: 253 #253 # how far from obstacle
+  neutral_cost: 66 #40
+  cost_factor:  0.55 #3
+  publish_potential: True
+  orientation_mode: 0.
+  orientation_window_size: 1
+
+
+EBandPlannerROS:
+  xy_goal_torelance: 0.5
+
+  max_vel_lin: 0.2
+  max_vel_th: 0.5
+  min_vel_lin: -0.2
+  min_vel_th: -0.5
+
+
+
+
+# Recovery behaviors
+conservative_reset:
+  reset_distance: 3.0
+
+agressive_reset:
+  reset_distance: 4.0

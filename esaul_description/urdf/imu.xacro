@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <gazebo>
+    <plugin filename="libcow_imu.so" name="imu_plugin">
+      <topicName>sensors/imu</topicName>
+      <serviceName>sensors/imu</serviceName>
+      <bodyName>base_link</bodyName>
+      <updateRateHZ>200.0</updateRateHZ>
+      <gaussianNoise>0.0</gaussianNoise>
+      <xyzOffset>0 0 0</xyzOffset>
+      <rpyOffset>0 0 0</rpyOffset>
+      <frameName>imu_link</frameName>
+    </plugin>
+  </gazebo>
+
+
+</robot>

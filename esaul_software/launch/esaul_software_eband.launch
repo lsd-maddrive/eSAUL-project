@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<launch>
+        <include file="$(find esaul_software)/launch/gmap.launch">  </include>
+        <include file="$(find esaul_software)/launch/lidar.launch">  </include>
+        <include file="$(find esaul_software)/launch/move_base_eband.launch">  </include>
+        <node name="rviz" pkg="rviz" type="rviz" args="-d $(find esaul_software)/config/rviz/esaul.rviz" />
+</launch>
