@@ -5,10 +5,11 @@
   <xacro:include filename="$(find esaul_description)/urdf/track.xacro" />
   <xacro:include filename="$(find esaul_description)/urdf/wheel.xacro" />
   <xacro:include filename="$(find esaul_description)/urdf/lidar.xacro" />
+  <xacro:include filename="$(find esaul_description)/urdf/imu.xacro" />
 
   <xacro:property name="M_PI" value="3.1415926535897931" />
 
-  <xacro:property name="chassis_mass" value="40" />
+  <xacro:property name="chassis_mass" value="20" />
   <xacro:property name="chassis_length" value="0.45" />
   <xacro:property name="chassis_width" value="0.22" />
   <xacro:property name="chassis_height" value="0.13" />
@@ -89,20 +90,22 @@
 	<xacro:joint_wheel_left name="joint_left_wheel" child="left_wheel" origin_xyz="0 0 0" />
 
   <xacro:support_wheel parent="link_left" location="left_1">
-    <origin xyz="${box_length/2} 0 0.028" rpy="0 0 0" />
+    <origin xyz="${box_length/2} 0 0.02796" rpy="0 0 0" />
   </xacro:support_wheel>
 
   <xacro:support_wheel parent="link_left" location="left_2">
-    <origin xyz="${-box_length/2} 0 0.028" rpy="0 0 0" />
+    <origin xyz="${-box_length/2} 0 0.02796" rpy="0 0 0" />
   </xacro:support_wheel>
 
   <xacro:support_wheel parent="link_right" location="right_1">
-    <origin xyz="${box_length/2} 0 0.028" rpy="0 0 0" />
+    <origin xyz="${box_length/2} 0 0.02796" rpy="0 0 0" />
   </xacro:support_wheel>
 
   <xacro:support_wheel parent="link_right" location="right_2">
-    <origin xyz="${-box_length/2} 0 0.028" rpy="0 0 0" />
+    <origin xyz="${-box_length/2} 0 0.02796" rpy="0 0 0" />
   </xacro:support_wheel>
+
+  
 
   <gazebo>
     		<plugin name="ModelPlugin" filename="libesaul_plugin.so" >

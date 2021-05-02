@@ -16,6 +16,8 @@
 #include <realtime_tools/realtime_publisher.h>
 
 #define Pi 3.1415926535
+#define noise 0
+#define size_noise 0.01
 
 using namespace std;
 
@@ -52,7 +54,7 @@ namespace gazebo
 				updateConnection = event::Events::ConnectWorldUpdateBegin(std::bind(&ModelPush::OnUpdate, this));
 				br = make_shared<tf::TransformBroadcaster>();
 				nh = ros::NodeHandle(roboname);
-				odom_pub = nh.advertise<nav_msgs::Odometry>("odom", 50);
+				odom_pub = nh.advertise<nav_msgs::Odometry>("/eSAUl/encoder", 50);
 				cmd_vel_sub_ = nh.subscribe("cmd_vel", 50, &ModelPush::CmdVel, this);
 			}
 		void updateOdom()
@@ -60,28 +62,40 @@ namespace gazebo
 				delta_time = ros::Time::now().toSec()-delta_time;
 				if(delta_time>0)
 				{
+					if(noise==1)
+					{
+						temp2 = (rand()/( (double)RAND_MAX )); 
+						
+						if (temp2 == 0)
+							p = 1;
+						else
+							p = -1;
+
+						temp1 = cos( ( 2.0 * (double)Pi ) * rand() / ( (double)RAND_MAX ) );
+						result = sqrt( -2.0 * log( temp2 ) ) * temp1 * size_noise;
+					}
+					else 
+						result = 0;
 
 					left_turn = (_joint_left->Position(0))-left_turn;
-					right_turn = (_joint_right->Position(0))-right_turn;	
-
-					left_speed = (_joint_left->GetVelocity(0));
-					right_speed = (_joint_right->GetVelocity(0));	
+					right_turn = (_joint_right->Position(0))-right_turn;		
 
 					left_speed = left_turn*rad/delta_time;
 					right_speed = right_turn*rad/delta_time;	
 
 					alpha = alpha + (right_speed-left_speed)/(width+rad)*delta_time;
 					x = x + (left_speed+right_speed)*0.5*cos(alpha)*delta_time;
-					y = y + (left_speed+right_speed)*0.5*sin(alpha)*delta_time;
+					y = y + (left_speed+right_speed)*0.5*sin(alpha)*delta_time;	
 
-
-					if (abs(x-t_last)>0.1)
-						{
-							cout << "х" << x << endl;
-							cout << "y" << y << endl;
-							cout << "..........................." << endl;
-							t_last = x;
-						}
+					if ((x-x_last)>0.01 || (y-y_last)>0.01 || (alpha-alpha_last)>0.01)
+					{
+						x = x + result;
+						y = y + result;						
+						alpha = alpha + result;						
+					}
+					x_last = x;
+					y_last = y;
+					alpha_last = alpha;
 				}
 				delta_time = ros::Time::now().toSec();
 				left_turn = (_joint_left->Position(0));
@@ -106,17 +120,19 @@ namespace gazebo
 
 				odom_pub.publish(msg);
 
-				geometry_msgs::TransformStamped odom_trans;
-				odom_trans.header.stamp = ros::Time::now();
-				odom_trans.header.frame_id = "odom";
-				odom_trans.child_frame_id = "base_link";
+				
 
-				odom_trans.transform.translation.x = x;
-				odom_trans.transform.translation.y = y;
-				odom_trans.transform.translation.z = 0.0;
-				odom_trans.transform.rotation = odom_quat;
+				// geometry_msgs::TransformStamped odom_trans;
+				// odom_trans.header.stamp = ros::Time::now();
+				// odom_trans.header.frame_id = "odom";
+				// odom_trans.child_frame_id = "base_link";
 
-				br->sendTransform(odom_trans);
+				// odom_trans.transform.translation.x = x;
+				// odom_trans.transform.translation.y = y;
+				// odom_trans.transform.translation.z = 0.0;
+				// odom_trans.transform.rotation = odom_quat;
+
+				// br->sendTransform(odom_trans);
 			}
 		void OnUpdate()
 			{
@@ -198,6 +214,9 @@ namespace gazebo
 		double rad=0;
 		double delta_time=0;
 		double x=0, y=0, alpha=0, pos_x=0, pos_y=0, last_x=0, last_y=0, last_alpha=0, alpha_deg=0;
+		double size = 100;
+		double p=1, temp2=0, temp1=0, result=0;
+		double x_last=0, y_last=0, alpha_last=0;
 		physics::ModelPtr model;
 		sdf::ElementPtr sdf;
 		std::string roboname;	

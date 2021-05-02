@@ -13,7 +13,7 @@
   <run_depend>gazebo_ros</run_depend>
   <run_depend>roscpp</run_depend>
   <build_depend>tf</build_depend>
-
+  <build_depend>sensor_msgs</build_depend>
 
   <!-- The export tag contains other, unspecified, tags -->
   <export>

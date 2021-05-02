@@ -55,7 +55,7 @@
         </scan>
         <range>
           <min>0.10</min>
-          <max>30.0</max>
+          <max>10</max>
           <resolution>0.01</resolution>
         </range>
         <noise>
@@ -66,7 +66,7 @@
       </ray>
       <plugin name="gazebo_ros_head_hokuyo_controller" filename="libgazebo_ros_laser.so">
         <topicName>/eSAUl/laser/scan</topicName>
-        <frameName>laser_frame</frameName>
+        <frameName>lidar_link</frameName>
       </plugin>
     </sensor>
   </gazebo>

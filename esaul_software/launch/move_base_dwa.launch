@@ -15,6 +15,7 @@
         <rosparam file="$(find esaul_software)/config/move_base/move_base_params_dwa.yaml" command="load" />
 
         <remap from="cmd_vel" to="eSAUl/cmd_vel"/>
+        
  </node>
  
 </launch> 

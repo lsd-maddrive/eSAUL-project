@@ -20,6 +20,7 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   gazebo_ros
   tf
+  sensor_msgs
 )
 
 # Depend on system install of Gazebo

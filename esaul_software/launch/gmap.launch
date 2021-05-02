@@ -38,6 +38,7 @@
     <param name="ymax" value="50.0"/>
   make the starting size small for the benefit of the Android client's memory...
   -->
+    <param name="transform_publish_period" value="0.1"/>
     <param name="xmin" value="-1.0"/>
     <param name="ymin" value="-1.0"/>
     <param name="xmax" value="1.0"/>
