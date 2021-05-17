@@ -15,7 +15,9 @@
         <rosparam file="$(find esaul_software)/config/move_base/move_base_params_dwa.yaml" command="load" />
 
         <remap from="cmd_vel" to="eSAUl/cmd_vel"/>
-        
+        <remap from="odom" to="/eSAUl/encoder"/>
+        <!-- <remap from="scan" to="/eSAUl/laser/scan"/> -->
+        <param name="base_local_planner" value="dwa_local_planner/DWAPlannerROS" />
  </node>
  
 </launch> 

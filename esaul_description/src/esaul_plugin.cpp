@@ -14,10 +14,13 @@
 #include <nav_msgs/Odometry.h>
 #include <realtime_tools/realtime_buffer.h>
 #include <realtime_tools/realtime_publisher.h>
+#include <geometry_msgs/Pose2D.h>
+
 
 #define Pi 3.1415926535
-#define noise 0
+#define noise 1
 #define size_noise 0.01
+#define mode 0
 
 using namespace std;
 
@@ -40,6 +43,8 @@ namespace gazebo
 
 				sdf->GetElement("width_chassis")->GetValue()->Get(width);
 				sdf->GetElement("wh_rad")->GetValue()->Get(rad);
+				
+
 
 				if (sdf->HasElement("robotName"))
 				{
@@ -52,10 +57,17 @@ namespace gazebo
 					cout << "********************Name don't received********************" << endl;
 				}
 				updateConnection = event::Events::ConnectWorldUpdateBegin(std::bind(&ModelPush::OnUpdate, this));
+				
+
+
 				br = make_shared<tf::TransformBroadcaster>();
 				nh = ros::NodeHandle(roboname);
-				odom_pub = nh.advertise<nav_msgs::Odometry>("/eSAUl/encoder", 50);
+				odom_pub_enc = nh.advertise<nav_msgs::Odometry>("/eSAUl/encoder", 100);
+				odom_pub_lazer = nh.advertise<nav_msgs::Odometry>("/eSAUl/lazer_scan_matcher/odom", 100);
+
 				cmd_vel_sub_ = nh.subscribe("cmd_vel", 50, &ModelPush::CmdVel, this);
+				Calman_odom_sub_ = nh.subscribe("/Calman/odom", 50, &ModelPush::Calman, this);
+				Lazer_scan_matcher_sub_ = nh.subscribe("/eSAUl/lazer_scan_matcher", 50, &ModelPush::ConvLazer, this);
 			}
 		void updateOdom()
 			{
@@ -79,23 +91,24 @@ namespace gazebo
 
 					left_turn = (_joint_left->Position(0))-left_turn;
 					right_turn = (_joint_right->Position(0))-right_turn;		
-
+					  
 					left_speed = left_turn*rad/delta_time;
 					right_speed = right_turn*rad/delta_time;	
 
-					alpha = alpha + (right_speed-left_speed)/(width+rad)*delta_time;
-					x = x + (left_speed+right_speed)*0.5*cos(alpha)*delta_time;
-					y = y + (left_speed+right_speed)*0.5*sin(alpha)*delta_time;	
 
-					if ((x-x_last)>0.01 || (y-y_last)>0.01 || (alpha-alpha_last)>0.01)
-					{
-						x = x + result;
-						y = y + result;						
-						alpha = alpha + result;						
-					}
-					x_last = x;
-					y_last = y;
-					alpha_last = alpha;
+					alpha = alpha + (right_speed-left_speed)/(width+rad)*delta_time + (right_speed-left_speed)/(width+rad)*delta_time*result;
+					x = x + (left_speed+right_speed)*0.5*cos(alpha)*delta_time + (left_speed+right_speed)*0.5*cos(alpha)*delta_time*result;
+					y = y + (left_speed+right_speed)*0.5*sin(alpha)*delta_time + (left_speed+right_speed)*0.5*sin(alpha)*delta_time *result;	
+
+					x_nonoise = x_nonoise + (left_speed+right_speed)*0.5*cos(alpha_nonise)*delta_time;
+					y_nonoise = y_nonoise + (left_speed+right_speed)*0.5*sin(alpha_nonise)*delta_time;
+					alpha_nonise = alpha_nonise + (right_speed-left_speed)/(width+rad)*delta_time; 
+
+					lin_speed_enc_x = (right_speed + left_speed) * cos(alpha);	
+					lin_speed_enc_y = (right_speed + left_speed) * sin(alpha);
+
+					ang_speed_enc_z = (right_speed - left_speed)/width;	
+
 				}
 				delta_time = ros::Time::now().toSec();
 				left_turn = (_joint_left->Position(0));
@@ -104,101 +117,99 @@ namespace gazebo
 			
 		void publishOdometryData()
 			{
-				nav_msgs::Odometry msg;
 				geometry_msgs::Quaternion odom_quat = tf::createQuaternionMsgFromYaw(alpha);
-				msg.header.stamp = ros::Time::now();
-				msg.header.frame_id = "odom";
+				geometry_msgs::Quaternion odom_quat_lazer = tf::createQuaternionMsgFromYaw(alpha_lazer);
+				if(mode)
+				{
+					nav_msgs::Odometry msg;
+					msg.header.stamp = ros::Time::now();
+					msg.header.frame_id = "odom";
 
-				msg.pose.pose.position.x = x;
-				msg.pose.pose.position.y = y;
-				msg.pose.pose.position.z = 0.0;
-				msg.pose.pose.orientation = odom_quat;
+					msg.pose.pose.position.x = x;
+					msg.pose.pose.position.y = y;
+					msg.pose.pose.position.z = 0.0;
+					msg.pose.pose.orientation = odom_quat;
 
-				msg.child_frame_id = "base_link";
-				msg.twist.twist.linear.x = line_speed;
-				msg.twist.twist.angular.z = ang_speed;
+					msg.child_frame_id = "base_link";
+					msg.twist.twist.linear.x = lin_speed_enc_x;
+					msg.twist.twist.linear.y = lin_speed_enc_y;
+					msg.twist.twist.angular.z = ang_speed_enc_z;
 
-				odom_pub.publish(msg);
+					odom_pub_enc.publish(msg);
 
+					nav_msgs::Odometry msg_1;
+
+					msg_1.header.stamp = ros::Time::now();
+					msg_1.header.frame_id = "odom";
+
+					msg_1.pose.pose.position.x = x_lazer;
+					msg_1.pose.pose.position.y = y_lazer;
+					msg_1.pose.pose.position.z = 0.0;
+					msg_1.pose.pose.orientation = odom_quat_lazer;
+
+					msg_1.child_frame_id = "base_link";
+					
+					odom_pub_lazer.publish(msg_1);
+				}
 				
+				else
+				{
+					geometry_msgs::TransformStamped odom_trans;
+					odom_trans.header.stamp = ros::Time::now();
+					odom_trans.header.frame_id = "odom";
+					odom_trans.child_frame_id = "base_link";
 
-				// geometry_msgs::TransformStamped odom_trans;
-				// odom_trans.header.stamp = ros::Time::now();
-				// odom_trans.header.frame_id = "odom";
-				// odom_trans.child_frame_id = "base_link";
+					odom_trans.transform.translation.x = x;
+					odom_trans.transform.translation.y = y;
+					odom_trans.transform.translation.z = 0.0;
+					odom_trans.transform.rotation = odom_quat;
 
-				// odom_trans.transform.translation.x = x;
-				// odom_trans.transform.translation.y = y;
-				// odom_trans.transform.translation.z = 0.0;
-				// odom_trans.transform.rotation = odom_quat;
-
-				// br->sendTransform(odom_trans);
+					br->sendTransform(odom_trans);
+				}
 			}
 		void OnUpdate()
 			{
 				updateOdom();
-				publishOdometryData();	
+				publishOdometryData();
 				_joint_left->SetVelocity(0, speed_l);
 				_joint_right->SetVelocity(0, speed_r);
-					// if(abs(left_mid_speed-right_mid_speed)<0.1)
-					// {
-					// 	delta_time = ros::Time::now().toSec() - last_time;
-					// 	alpha = alpha;
-					// 	x = x + (left_mid_speed+right_mid_speed)*0.5*rad*cos(alpha)*delta_time;
-					// 	y = y + (left_mid_speed+right_mid_speed)*0.5*rad*sin(alpha)*delta_time;
-					// 	publishOdometryData();
-					// 	last_time = ros::Time::now().toSec();
-					// }
-					// if(abs(left_speed_1-left_speed_2)>1 || abs(left_speed_1-left_speed_3)>1)
-					// {
-					// 	delta_time = ros::Time::now().toSec() - last_time;
-					// 	alpha = alpha + rad*(left_mid_speed-right_mid_speed)/width*delta_time;
-					// 	x = x + (left_mid_speed+right_mid_speed)*0.5*rad*cos(alpha)*delta_time;
-					// 	y = y + (left_mid_speed+right_mid_speed)*0.5*rad*sin(alpha)*delta_time;
-					// 	// if(left_mid - right_mid<0.01)
-					// 	// {
-					// 	// 	x = rad*(left_mid + right_mid)/2;
-					// 	// 	y = rad*(left_mid + right_mid)/2;
-					// 	// }
-					// 	// if (abs(x-t_last)>0.01)
-					// 	// {
-					// 	// 	cout << rad*(left_mid_speed-right_mid_speed)/width << endl;
-					// 	// 	cout << alpha << endl;
-					// 	// 	cout << abs(left_speed_1-left_speed_2) << endl;
-					// 	// 	cout << abs(left_speed_1-left_speed_3) << endl;
-					// 	// 	// cout << right_speed_3 << endl;
-					// 	// 	cout << "..........................." << endl;
-					// 	// 	t_last = x;
-					// 	// }	
-					// 	//cout << "Зашел сюды" << endl;
-					// 	publishOdometryData();
-					// 	last_time = ros::Time::now().toSec();
-					// }
-					// delta_time = ros::Time::now().toSec() - last_time;
-
-					// alpha = alpha + ang_speed*delta_time;
-					// //x = x+(speed_r*rad + speed_l*rad)*0.5*cos(alpha)*delta_time;
-					// y = y+(speed_r*rad + speed_l*rad)*0.5*sin(alpha)*delta_time;
-
-					// last_time = ros::Time::now().toSec();
-					// alpha_deg=alpha*180/3,1415926535;
-					// if((last_x!=x) || (last_y!=y) || (last_alpha!=alpha))
-					// {
-					// 	cout << "Позиция по Х: " << x << endl;
-					// 	cout << "Позиция по Y: " << y << endl;
-					// 	cout << "Угол градусы: " << alpha_deg << endl;
-					// 	last_x = x;
-					// 	last_y = y;
-					// 	last_alpha = alpha;
-					// }
+				real_x = model->RelativePose().Pos().X();
+				real_y = model->RelativePose().Pos().Y();
+				// FileWrite();	
+				last_y = real_y;
+				last_x = real_x;					
 				
 			}
+			// void FileWrite()
+			// {
+
+			// 	ofstream out ("", ios::app);
+			// 	if (out.is_open())
+			// 	{
+			// 		out << real_x << " " << real_y << " " << x << " " << y <<  " " << Calman_x << " " << Calman_y << " " << x_nonoise << " " << y_nonoise << std::endl;
+			// 	}
+			// 	out.close();
+
+			// }
+			
 			void CmdVel(const geometry_msgs::Twist &msg)
 			{
 				ang_speed = msg.angular.z;
 				speed_r = msg.linear.x/rad + (msg.angular.z*width/(2*rad));
 				speed_l = msg.linear.x/rad - (msg.angular.z*width/(2*rad));
 				
+			}
+			void Calman(const nav_msgs::Odometry &msg)
+			{  
+				Calman_x = msg.pose.pose.position.x;
+				Calman_y = msg.pose.pose.position.y;
+				
+			}
+			void ConvLazer(const geometry_msgs::Pose2D::ConstPtr &msg)
+			{  
+				x_lazer = msg->x;
+				y_lazer = msg->y;
+				alpha_lazer = msg->theta;
 			}
 		~ModelPush()
 			{
@@ -212,21 +223,28 @@ namespace gazebo
 		double ang_speed=0, line_speed=0;
 		double width=0;
 		double rad=0;
+		double x_lazer = 0, y_lazer=0, alpha_lazer=0;
 		double delta_time=0;
 		double x=0, y=0, alpha=0, pos_x=0, pos_y=0, last_x=0, last_y=0, last_alpha=0, alpha_deg=0;
 		double size = 100;
+		double x_nonoise=0, y_nonoise=0, alpha_nonise=0;
 		double p=1, temp2=0, temp1=0, result=0;
 		double x_last=0, y_last=0, alpha_last=0;
+		double lin_speed_enc_x = 0, lin_speed_enc_y = 0, ang_speed_enc_z = 0;
+		double real_x=0, real_y=0, Calman_x=0, Calman_y=0; 
 		physics::ModelPtr model;
 		sdf::ElementPtr sdf;
 		std::string roboname;	
 		ros::NodeHandle nh;
 		event::ConnectionPtr updateConnection;
 		ros::Subscriber cmd_vel_sub_;
+		ros::Subscriber Calman_odom_sub_;
+		ros::Subscriber Lazer_scan_matcher_sub_;
 		physics::JointPtr _joint_left;
 		physics::JointPtr _joint_right;
 		std_msgs::Float32 msg;
-		ros::Publisher odom_pub;
+		ros::Publisher odom_pub_enc;
+		ros::Publisher odom_pub_lazer;
 		shared_ptr<tf::TransformBroadcaster> br;
 	};
 

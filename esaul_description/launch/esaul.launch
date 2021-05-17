@@ -9,10 +9,10 @@
 	<param name="robot_description" command="$(find xacro)/xacro '$(find esaul_description)/urdf/esaul.xacro'" />
 
     	<arg name="x" default="0"/>
-	<arg name="y" default="-2"/>
-	<arg name="z" default="2"/>
-    
-        <node name="robot_state_publisher" pkg="robot_state_publisher" type="state_publisher" respawn="false" output="screen">
+	<arg name="y" default="0"/>
+	<arg name="z" default="0.5"/>
+
+        <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" respawn="false" output="screen">
                 <param name="robot_description" command="$(find xacro)/xacro '$(find esaul_description)/urdf/esaul.xacro'"/>
                 <remap from="/joint_states" to="/eSAUl/joint_states" />
         </node>  

@@ -4,10 +4,11 @@
         
         <arg name="lidar_z" default="0.075" />
 
-        <node pkg="tf" type="static_transform_publisher" name="base_link_to_laser" 
-          args="0.0 0.0 $(arg lidar_z) 0.0 0.0 0.0 base_link laser_frame 100" />
 
         <node pkg="tf" type="static_transform_publisher" name="base_link_to_imu" 
           args="0.0 0.0 $(arg lidar_z) 0.0 0.0 0.0 base_link imu_link 100" />
+<!--           
+        <node pkg="tf" type="static_transform_publisher" name="odom_to_map" 
+          args="0.0 0.0 0.0 0.0 0.0 0.0 map odom 0" /> -->
           
 </launch>

@@ -1,63 +1,16 @@
 <?xml version="1.0"?>
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro">
 
-  <xacro:property name="imu_mass" value="0.01" />
-  <xacro:property name="imu_height" value="0.0002"/>
-  <xacro:property name="imu_radius" value="0.0004"/>
-  <xacro:property name="chassis_height" value="0.13" />
-
-
-  <xacro:macro name="solid_cylinder_inertial"
-               params="r h mass *origin">
-    <inertial>
-      <xacro:insert_block name="origin"/>
-      <mass value="${mass}"/>
-      <inertia ixx="${(mass * h * h)/12 + (mass * r * r)/4}" ixy="0.0" ixz="0.0"
-               iyy="${(mass * h * h)/12 + (mass * r * r)/4}" iyz="0.0"
-               izz="${mass / 2 * r * r}" />
-    </inertial>
-  </xacro:macro>
-
- <link name="imu_link">
-    <xacro:solid_cylinder_inertial
-        r="${imu_radius}" h="${imu_height}"
-        mass="${imu_mass}" >
-      <origin xyz="0 0 0" rpy="0 0 0" />
-    </xacro:solid_cylinder_inertial>
-    <collision>
-      <origin xyz="0 0 0" rpy="0 0 0"/>
-      <geometry>
-        <cylinder length="${imu_height}" radius="${imu_radius}"/>
-      </geometry>
-    </collision>
-
-    <visual>
-      <origin xyz="0 0 0" rpy="0 0 0"/>
-      <geometry>
-        <cylinder length="${imu_height}" radius="${imu_radius}"/>
-      </geometry>
-    </visual>
-  </link>
-
   <gazebo>
-      <plugin filename="libcow_imu.so" name="imu_plugin">
-        <topicName>eSAUl/imu</topicName>
-        <serviceName>eSAUl/service</serviceName>
-        <bodyName>base_link</bodyName>
-        <updateRateHZ>100.0</updateRateHZ>
-        <gaussianNoise>0</gaussianNoise>
-        <xyzOffset>0 0 0</xyzOffset>
-        <rpyOffset>0 0 0</rpyOffset>
-        <frameName>imu_link</frameName>
-      </plugin>
+    <plugin name="imu_plugin" filename="libgazebo_ros_imu.so">
+      <alwaysOn>true</alwaysOn>
+      <bodyName>base_link</bodyName>
+      <topicName>/eSAUl/imu</topicName>
+      <serviceName>/eSAUl/service</serviceName>
+      <gaussianNoise>0.0</gaussianNoise>
+      <updateRate>50.0</updateRate>
+    </plugin>
   </gazebo>
-
-  <joint name="imu_joint" type="fixed">
-    <axis xyz="0 1 0" />
-    <origin xyz="0 0 ${chassis_height/2}" rpy="0 0 0"/>
-    <parent link="base_link"/>
-    <child link="imu_link"/>
-  </joint>
 
 
 </robot>

@@ -78,31 +78,31 @@
 
 
   <xacro:link_track name="link_right" />
-	<xacro:joint_track name="joint_right" child="link_right" origin_xyz="0 ${-chassis_width/2-box_width/1.5} ${-2*box_width}" />
+	<xacro:joint_track name="joint_right" child="link_right" origin_xyz="0 ${-chassis_width/2-box_width/1.5} ${-2.1*box_width}" />
 
   <xacro:link_wheel name="right_wheel" />
 	<xacro:joint_wheel_right name="joint_right_wheel" child="right_wheel" origin_xyz="0 0 0" />
 
   <xacro:link_track name="link_left" />
-	<xacro:joint_track name="joint_left" child="link_left" origin_xyz="0 ${chassis_width/2+box_width/1.5} ${-2*box_width}" />
+	<xacro:joint_track name="joint_left" child="link_left" origin_xyz="0 ${chassis_width/2+box_width/1.5} ${-2.1*box_width}" />
 
   <xacro:link_wheel name="left_wheel" />
 	<xacro:joint_wheel_left name="joint_left_wheel" child="left_wheel" origin_xyz="0 0 0" />
 
   <xacro:support_wheel parent="link_left" location="left_1">
-    <origin xyz="${box_length/2} 0 0.02796" rpy="0 0 0" />
+    <origin xyz="${box_length/2} 0 0.027965" rpy="0 0 0" />
   </xacro:support_wheel>
 
   <xacro:support_wheel parent="link_left" location="left_2">
-    <origin xyz="${-box_length/2} 0 0.02796" rpy="0 0 0" />
+    <origin xyz="${-box_length/2} 0 0.027965" rpy="0 0 0" />
   </xacro:support_wheel>
 
   <xacro:support_wheel parent="link_right" location="right_1">
-    <origin xyz="${box_length/2} 0 0.02796" rpy="0 0 0" />
+    <origin xyz="${box_length/2} 0 0.027965" rpy="0 0 0" />
   </xacro:support_wheel>
 
   <xacro:support_wheel parent="link_right" location="right_2">
-    <origin xyz="${-box_length/2} 0 0.02796" rpy="0 0 0" />
+    <origin xyz="${-box_length/2} 0 0.027965" rpy="0 0 0" />
   </xacro:support_wheel>
 
   

@@ -48,7 +48,7 @@ DWAPlannerROS:
   min_vel_x: -0.8
   max_vel_y: 0.
   min_vel_y: 0.
-  max_vel_theta: 9.0  # 0.5  
+  max_vel_theta: 0.5  
 
   yaw_goal_tolerance: 0.3
   xy_goal_tolerance: 0.3
